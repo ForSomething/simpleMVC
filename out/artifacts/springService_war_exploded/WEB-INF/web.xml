@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"
+         metadata-complete="true">
+  <servlet>
+    <servlet-name>sm</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <!-- 这个是固定写法，标识spring上下文配置文件的位置 -->
+      <param-name>contextConfigLocation</param-name>
+      <!-- 可以写多个xml文件，以空格分开 -->
+      <param-value>/WEB-INF/springMVC.xml /WEB-INF/serviceBean.xml WEB-INF/daoBean.xml</param-value>
+    </init-param>
+    <!--<load-on-startup>1</load-on-startup>-->
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sm</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>
