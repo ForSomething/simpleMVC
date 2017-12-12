@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="springService:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/springService_war_exploded</output-path>
+    <output-path>$PROJECT_DIR$/target/springService</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -15,7 +15,11 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-jcl:5.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-expression:5.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-web:5.0.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.jsoup:jsoup:1.11.2" />
         </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/springService/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="springService/web/Web" />
     </root>

@@ -1,13 +1,17 @@
 package service.impl;
 
 
+import Util.Const;
+import com.sun.xml.internal.ws.developer.MemberSubmissionEndpointReference;
 import dao.CrawlerDao;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import service.CrawlerService;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -20,10 +24,30 @@ public class CrawlerServiceImpl implements CrawlerService {
     }
 
     public String doCrawler(String path) throws IOException {
+        String resultStr = "ok";
         URL url = new URL(path);
-        URLConnection con = url.openConnection();
-        InputStreamReader streamReader = new InputStreamReader(con.getInputStream());
-        BufferedReader bufferedReader = new BufferedReader(streamReader);
-        return null;
+        File file = new File("C:\\Users\\Administrator\\Desktop\\scrip.txt");
+        FileOutputStream fileOutputStream = new FileOutputStream(file,true);
+        Document doc = Jsoup.parse(url, Const.HttpConnectTimeOut);
+        doc.outerHtml();
+        Elements elements = doc.getElementsByClass("sku-name");
+        String outterHTML;
+        for(Element one : elements){
+            outterHTML = one.outerHtml();
+            fileOutputStream.write(getByteArray(outterHTML));
+        }
+        fileOutputStream.close();
+        return resultStr;
+    }
+
+    private byte[] getByteArray(String str){
+        char[] charArray = str.toCharArray();
+        byte[] resultArray = new byte[charArray.length + 1];
+
+        for(int i = 0; i < charArray.length; i++){
+            resultArray[i] = (byte)charArray[i];
+        }
+        resultArray[resultArray.length - 1] = '\t';
+        return resultArray;
     }
 }

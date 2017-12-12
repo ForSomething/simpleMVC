@@ -8,16 +8,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import service.CrawlerService;
 
+import java.io.IOException;
+
 @Controller
 @RequestMapping(path = "/crawler")
 public class CrawlerAction {
     @Autowired
     CrawlerService crawlerService;
 
+    @RequestMapping(path = "/test")
+    @ResponseBody
+    public String Test(){
+
+        return crawlerService.GetViewStr() + "now you see is json";
+    }
+
     @RequestMapping(path = "/getImg")
     @ResponseBody
     public String getImg(String path){
-
-        return crawlerService.GetViewStr() + "now you see is json";
+        try {
+            return crawlerService.doCrawler("https://item.jd.com/2953318.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
 }
