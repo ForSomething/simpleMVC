@@ -1,5 +1,6 @@
 package action;
 
+import Util.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,17 @@ public class CrawlerAction {
     public String getImg(String path){
         try {
             return crawlerService.doCrawler("https://item.jd.com/2953318.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
+    @RequestMapping(path = "/getPrice")
+    @ResponseBody
+    public String getPrice(String keyWord){
+        try {
+            return crawlerService.getSearchListInfo(Const.jdSearchURLStr.replace("%%kw%%",keyWord));
         } catch (IOException e) {
             e.printStackTrace();
             return e.getMessage();
