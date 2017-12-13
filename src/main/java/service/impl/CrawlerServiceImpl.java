@@ -2,6 +2,7 @@ package service.impl;
 
 
 import Util.Const;
+import Util.StringUtil;
 import com.sun.xml.internal.ws.developer.MemberSubmissionEndpointReference;
 import dao.CrawlerDao;
 import org.jsoup.Jsoup;
@@ -33,21 +34,10 @@ public class CrawlerServiceImpl implements CrawlerService {
         Elements elements = doc.getElementsByClass("sku-name");
         String outterHTML;
         for(Element one : elements){
-            outterHTML = one.outerHtml();
-            fileOutputStream.write(getByteArray(outterHTML));
+            outterHTML = one.html();
+            fileOutputStream.write(StringUtil.GetByteArray(outterHTML));
         }
         fileOutputStream.close();
         return resultStr;
-    }
-
-    private byte[] getByteArray(String str){
-        char[] charArray = str.toCharArray();
-        byte[] resultArray = new byte[charArray.length + 1];
-
-        for(int i = 0; i < charArray.length; i++){
-            resultArray[i] = (byte)charArray[i];
-        }
-        resultArray[resultArray.length - 1] = '\t';
-        return resultArray;
     }
 }
