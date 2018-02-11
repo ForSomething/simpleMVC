@@ -14,4 +14,11 @@ public class HttpHelper {
         HttpGet httpGet = new HttpGet(urlStr);
         return httpClient.execute(httpGet);
     }
+
+    public  static  HttpResponse doPost(String urlStr,Object param) throws IOException {
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        CloseableHttpClient httpClient = clientBuilder.build();
+        HttpGet httpGet = new HttpGet(urlStr);
+        return httpClient.execute(httpGet);
+    }
 }
