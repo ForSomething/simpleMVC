@@ -5,6 +5,14 @@ public class Const {
         redirectTo,
         download,
         getTag,
-        getJson
+        getJson,
+        handleAsJSON
+    }
+
+    public enum contentHandleAction{
+        handleAsJSON,
+        handleAsXML,
+        handleAsHtml,
+        handleAsText
     }
 }

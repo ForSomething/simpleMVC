@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Date;
+import java.util.Map;
 
 public class DefaultRequest {
     private static DefaultRequest instance = new DefaultRequest();
@@ -30,12 +31,11 @@ public class DefaultRequest {
 
     private DefaultRequest(){}
 
-    public ResponseEntity doRequest(Method method, String url, Object... param) throws IOException {
+    public ResponseEntity doRequest(Method method, String url,Map<String,String> header,Map<String,String> param) throws IOException {
         HttpResponse response;
         switch (method){
-            case GET: response = HttpHelper.doGet(url);break;
-            case POST:
-                response = HttpHelper.doPost(url,param == null || param.length == 0 ? null : param[0]);break;
+            case GET: response = HttpHelper.doGet(url,header);break;
+            case POST:response = HttpHelper.doPost(url,header,param);break;
             default: response = null;
         }
         if(response != null){
@@ -45,14 +45,15 @@ public class DefaultRequest {
                 Header[] headers = response.getHeaders("Location");
                 if(headers != null && headers.length > 0){
                     //获取重定向url，进行重定向
-                    String redirectUrl = headers[0].getValue();
-                    entity = doRequest(method,redirectUrl,param);
+                    //TODO 重定向应该还要可以用新的请求头和请求参数
+//                    String redirectUrl = headers[0].getValue();
+//                    entity = doRequest(method,redirectUrl,param);
                 }
             }else{
                 entity = new ResponseEntity();
                 entity.setStateCode(response.getStatusLine().getStatusCode());
                 entity.setBaseUrl(url);
-                entity.setContent(EntityUtils.toString(response.getEntity()));
+                entity.setContent(EntityUtils.toString(response.getEntity(),"utf-8"));
                 //先从http头中获取域名，如果获取不到，则用正则表达式从url中抠出域名
                 Header[] headers = response.getHeaders("Host");
                 if(headers != null && headers.length > 0){
@@ -68,7 +69,7 @@ public class DefaultRequest {
 
     public AttachmentEntity getAttachment(String url) throws IOException {
         AttachmentEntity attachmentEntity = new AttachmentEntity();
-        HttpResponse response = HttpHelper.doGet(url);
+        HttpResponse response = HttpHelper.doGet(url,null);
         Header[] headers = response.getHeaders("Content-Disposition");
         if(headers != null && headers.length > 0){
 

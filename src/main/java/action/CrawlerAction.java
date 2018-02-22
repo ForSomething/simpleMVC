@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import service.CrawlerService;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/crawler")
@@ -24,10 +28,17 @@ public class CrawlerAction {
     public String Test(){
         String errStr = StringUtil.emptyString;
         DefaultCrawlerProxy proxy = DefaultCrawlerProxy.GetInstance();
+        Map<String,String> requestHeader = new HashMap<String, String>();
         try {
             DefaultConfigEntity configEntity = new DefaultConfigEntity();
-            configEntity.setUrl("http://a.jd.com/indexAjax/getCouponListByCatalogId.html?callback=jQuery4112838&catalogId=0&page=1&pageSize=9&_=1518365576811");
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            String dateTimeStr = String.valueOf(calendar.getTimeInMillis());
+            configEntity.setUrl("http://a.jd.com/indexAjax/getCouponListByCatalogId.html?callback=jQuery3219893&catalogId=19&page=1&pageSize=50&_=" + dateTimeStr);
             configEntity.setMethod(DefaultRequest.Method.GET);
+            configEntity.setHandleAction(Crawlerfj.Common.Const.contentHandleAction.handleAsJSON);
+            configEntity.setRequestHeader(requestHeader);
+            requestHeader.put("Referer","https://a.jd.com/");
             DefaultConfigEntity.ElementEntity elementEntity = configEntity.new ElementEntity();
             elementEntity.setHandleAction(Crawlerfj.Common.Const.elementHandleAction.getJson);
 //            elementEntity.setDownloadFolderPath("C:\\Users\\Administrator\\Desktop\\img");

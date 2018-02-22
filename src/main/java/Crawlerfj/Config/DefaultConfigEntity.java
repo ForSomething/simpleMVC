@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class DefaultConfigEntity {
     //需要爬取的元素的列表
@@ -20,7 +21,13 @@ public class DefaultConfigEntity {
     private DefaultRequest.Method method;
 
     //请求参数
-    private Object[] param = null;
+    private Map<String,String> param = null;
+
+    //自定义的请求头
+    private Map<String,String> requestHeader = null;
+
+    //对爬取到的内容进行什么样的处理,默认当做html处理
+    private Const.contentHandleAction handleAction = Const.contentHandleAction.handleAsHtml;
 
     public DefaultConfigEntity(){
         elementList = new ArrayList<ElementEntity>();
@@ -46,7 +53,7 @@ public class DefaultConfigEntity {
         return method;
     }
 
-    public Object[] getParam() {
+    public Map<String,String> getParam() {
         return param;
     }
 
@@ -54,16 +61,32 @@ public class DefaultConfigEntity {
         this.url = url;
     }
 
-    public void setMethod(DefaultRequest.Method methond) {
-        this.method = methond;
+    public void setMethod(DefaultRequest.Method method) {
+        this.method = method;
     }
 
-    public void setParam(Object[] param) {
+    public void setParam(Map<String,String> param) {
         this.param = param;
     }
 
     public int getElementEntityCount(){
         return elementList.size();
+    }
+
+    public Map<String, String> getRequestHeader() {
+        return requestHeader;
+    }
+
+    public void setRequestHeader(Map<String, String> requestHeader) {
+        this.requestHeader = requestHeader;
+    }
+
+    public Const.contentHandleAction getHandleAction() {
+        return handleAction;
+    }
+
+    public void setHandleAction(Const.contentHandleAction handleAction) {
+        this.handleAction = handleAction;
     }
 
     public class ElementEntity{

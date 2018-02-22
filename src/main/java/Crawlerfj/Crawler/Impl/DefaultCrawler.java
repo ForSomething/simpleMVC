@@ -27,43 +27,70 @@ public class DefaultCrawler implements ICrawlerfj {
         try{
             DefaultConfigEntity configEntity = (DefaultConfigEntity)_configEntity;
             DefaultRequest requestHandler = DefaultRequest.GetInstance();
-            ResponseEntity responseEntity = requestHandler.doRequest(configEntity.getMethod(), configEntity.getUrl(), configEntity.getParam());
+            ResponseEntity responseEntity = requestHandler.doRequest(configEntity.getMethod(),
+                    configEntity.getUrl(), configEntity.getRequestHeader(),configEntity.getParam());
 
-            Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
-            Elements elements = new Elements(doc);
-            Elements tempElements;
-
-            //第一层循环遍历需要爬取的元素
-            for(DefaultConfigEntity.ElementEntity elementEntity : configEntity.getElementEntityList()){
-                //第二层循环按选择器层次结构遍历选择器
-                for(String selector : elementEntity.getSelectorList()){
-                    tempElements = new Elements();
-                    //第三层循环，利用遍历到的选择器从上次获取到的元素列表中获取下一层的元素
-                    for(Element element : elements){
-                        tempElements.addAll(element.select(selector));
-                    }
-                    elements = tempElements;
-                }
-                //里面两次遍历结束之后，获取到的就是第n个需要爬取的元素的列表
-                //之后我们就根据handleAction来处理这些元素
-                if(elements.size() == 0){
-                    continue;
-                }
-                switch (elementEntity.getHandleAction()){
-                    case getTag:doGetTag(elements);break;
-                    case redirectTo:doRedirectTo(elements,responseEntity);break;
-                    case download:doDownload(elements,responseEntity,elementEntity.getDownloadFolderPath());break;
-                    default:break;
-                }
+            switch (configEntity.getHandleAction()){
+                case handleAsHtml:HandleAsHtml(configEntity,responseEntity);break;
+                case handleAsJSON:HandleAsJSON(configEntity,responseEntity);break;
             }
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    private void doRedirectTo(Elements elements,ResponseEntity resEntity){
-        //TODO
+    private void HandleAsHtml(DefaultConfigEntity configEntity,ResponseEntity responseEntity){
+        Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
+        Elements elements = new Elements(doc);
+        Elements tempElements;
 
+        //第一层循环遍历需要爬取的元素
+        for(DefaultConfigEntity.ElementEntity elementEntity : configEntity.getElementEntityList()){
+            //第二层循环按选择器层次结构遍历选择器
+            for(String selector : elementEntity.getSelectorList()){
+                tempElements = new Elements();
+                //第三层循环，利用遍历到的选择器从上次获取到的元素列表中获取下一层的元素
+                for(Element element : elements){
+                    tempElements.addAll(element.select(selector));
+                }
+                elements = tempElements;
+            }
+            //里面两次遍历结束之后，获取到的就是第n个需要爬取的元素的列表
+            //之后我们就根据handleAction来处理这些元素
+            if(elements.size() == 0){
+                continue;
+            }
+            switch (elementEntity.getHandleAction()){
+                case getTag:doGetTag(elements);break;
+                case redirectTo:doRedirectTo(elements,responseEntity);break;
+                case download:doDownload(elements,responseEntity,elementEntity.getDownloadFolderPath());break;
+                default:break;
+            }
+        }
+    }
+
+    private void HandleAsJSON(DefaultConfigEntity configEntity,ResponseEntity responseEntity){
+        //TODO 因为存在response的content中不完全是JSON的情况，就先把conten写到文件中
+        File file = new File("C:\\Users\\Administrator\\Desktop\\scrip.txt");
+        OutputStreamWriter writer = null;
+        try {
+            writer = new FileWriter(file,false);
+            writer.write(responseEntity.getContent());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(writer != null){
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void doRedirectTo(Elements elements,ResponseEntity resEntity) {
+        //TODO
     }
 
     private void doDownload(Elements elements,ResponseEntity resEntity,String folderPath){
