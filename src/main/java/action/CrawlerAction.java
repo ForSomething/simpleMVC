@@ -1,7 +1,9 @@
 package action;
 
 import Crawlerfj.Common.StringUtil;
-import Crawlerfj.Config.DefaultConfigEntity;
+import Crawlerfj.Config.DefaultConfig.DefaultConfigEntity;
+import Crawlerfj.Config.DefaultConfig.TaskBuilder;
+import Crawlerfj.Exception.ConfigIllegalException;
 import Crawlerfj.Proxy.DefaultCrawlerProxy;
 import Crawlerfj.Request.DefaultRequest;
 import Util.Const;
@@ -29,25 +31,50 @@ public class CrawlerAction {
         String errStr = StringUtil.emptyString;
         DefaultCrawlerProxy proxy = DefaultCrawlerProxy.GetInstance();
         Map<String,String> requestHeader = new HashMap<String, String>();
+        TaskBuilder.GetContentTaskBuilder getContentTaskBuilder = TaskBuilder.CreateGetContentTaskBuilder();
+        TaskBuilder.GetHtmlElementTaskBuilder getHtmlElementTaskBuilder = TaskBuilder.CreateGetHtmlElementTaskBuilder();
+        TaskBuilder.DoRedirectTaskBuilder doRedirectTaskBuilder = TaskBuilder.CreateDoRedirectTaskBuilder();
+        DefaultConfigEntity configEntity = new DefaultConfigEntity();
         try {
-            DefaultConfigEntity configEntity = new DefaultConfigEntity();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            String dateTimeStr = String.valueOf(calendar.getTimeInMillis());
-            configEntity.setUrl("http://a.jd.com/indexAjax/getCouponListByCatalogId.html?callback=jQuery3219893&catalogId=19&page=1&pageSize=50&_=" + dateTimeStr);
+
+            /*这个是爬京东优惠券列表的*/
+//            requestHeader.put("Referer","https://a.jd.com/");
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(new Date());
+//            String dateTimeStr = String.valueOf(calendar.getTimeInMillis());
+//            //这个url中有个callback参数，京东会根据这个参数拼接返回的JSON，将这个参数置空方便下面对JSON的处理
+//            configEntity.setUrl("http://a.jd.com/indexAjax/getCouponListByCatalogId.html?callback=&catalogId=19&page=1&pageSize=50&_=" + dateTimeStr);
+//            configEntity.setRequestHeader(requestHeader);
+//            configEntity.setMethod(DefaultRequest.Method.GET);
+//            configEntity.setContentFormatter(value -> {
+//                value = value.replaceAll("^\\(",""); //去掉字符串首的左括号
+//                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
+//                return value;
+//            });
+
+
+
+            /*这个是爬图片的*/
+            DefaultConfigEntity.TaskEntity taskEntity;
+            configEntity.setUrl("http://www.xgyw.cc/YouMi/8202.html");
+//            htmlCrawlerConfigBuilder.setUrl("http://www.comicool.cn/content/reader.html?comic_id=12485&ep_id=19&update_weekday=0");
             configEntity.setMethod(DefaultRequest.Method.GET);
-            configEntity.setHandleAction(Crawlerfj.Common.Const.contentHandleAction.handleAsJSON);
-            configEntity.setRequestHeader(requestHeader);
-            requestHeader.put("Referer","https://a.jd.com/");
-            DefaultConfigEntity.ElementEntity elementEntity = configEntity.new ElementEntity();
-            elementEntity.setHandleAction(Crawlerfj.Common.Const.elementHandleAction.getJson);
-//            elementEntity.setDownloadFolderPath("C:\\Users\\Administrator\\Desktop\\img");
-//            elementEntity.nextLevelSelector(".img")
-//                    .nextLevelSelector("p")
-//                    .nextLevelSelector("img");
-            configEntity.addElementEntity(elementEntity);
+            getHtmlElementTaskBuilder.setDownloadFolderPath("C:\\Users\\Administrator\\Desktop\\img");
+            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.download);
+            getHtmlElementTaskBuilder.setSelector("p img");
+            configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
+
+            doRedirectTaskBuilder.setSelector(".page a");
+            doRedirectTaskBuilder.AddTask(getHtmlElementTaskBuilder.CreateTaskEntity());
+            configEntity.addTask(doRedirectTaskBuilder.CreateTaskEntity());
+
+
+
+
             proxy.Crawling(configEntity);
-        } catch (Exception e) {
+        } catch (ConfigIllegalException e) {
+            errStr = e.getMessage();
+        }catch (Exception e){
             errStr = e.getMessage();
         }
         if(!StringUtil.IsNullOrWihtespace(errStr)){

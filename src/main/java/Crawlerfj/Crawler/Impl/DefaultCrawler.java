@@ -1,7 +1,6 @@
 package Crawlerfj.Crawler.Impl;
 
-import Crawlerfj.Common.StringUtil;
-import Crawlerfj.Config.DefaultConfigEntity;
+import Crawlerfj.Config.DefaultConfig.DefaultConfigEntity;
 import Crawlerfj.Crawler.ICrawlerfj;
 import Crawlerfj.Entity.AttachmentEntity;
 import Crawlerfj.Entity.ResponseEntity;
@@ -12,9 +11,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.util.LinkedList;
 
 public class DefaultCrawler implements ICrawlerfj {
-
     public boolean CanHandle(Object configEntity) {
         if(configEntity != null &&
                 DefaultConfigEntity.class.getCanonicalName().equals(configEntity.getClass().getCanonicalName())){
@@ -24,55 +23,51 @@ public class DefaultCrawler implements ICrawlerfj {
     }
 
     public void Crawling(Object _configEntity) {
+        LinkedList<DefaultConfigEntity.TaskEntity> redirectTaskList = new LinkedList<DefaultConfigEntity.TaskEntity>();
         try{
             DefaultConfigEntity configEntity = (DefaultConfigEntity)_configEntity;
             DefaultRequest requestHandler = DefaultRequest.GetInstance();
             ResponseEntity responseEntity = requestHandler.doRequest(configEntity.getMethod(),
                     configEntity.getUrl(), configEntity.getRequestHeader(),configEntity.getParam());
 
-            switch (configEntity.getHandleAction()){
-                case handleAsHtml:HandleAsHtml(configEntity,responseEntity);break;
-                case handleAsJSON:HandleAsJSON(configEntity,responseEntity);break;
+            //如果用户设置了ContentFormat，则用ContentFormat先处理一下Content
+            if(configEntity.getContentFormatter() != null){
+                responseEntity.setContent(configEntity.getContentFormatter().execute(responseEntity.getContent()));
+            }
+            for(DefaultConfigEntity.TaskEntity task : configEntity.getTaskList()){
+                switch (task.getTaskType()){
+                    case redirect:redirectTaskList.add(task);break; //将充定向的任务放入列表中，在后面统一处理
+                    case getContent: GetContent(task,responseEntity);break;
+                    case getHtmlElement: GetHtmlElement(task,responseEntity);
+                }
+            }
+            for(DefaultConfigEntity.TaskEntity task : redirectTaskList){
+                Redirect(task,responseEntity);
             }
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    private void HandleAsHtml(DefaultConfigEntity configEntity,ResponseEntity responseEntity){
+    private void GetHtmlElement(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
         Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
-        Elements elements = new Elements(doc);
-        Elements tempElements;
-
-        //第一层循环遍历需要爬取的元素
-        for(DefaultConfigEntity.ElementEntity elementEntity : configEntity.getElementEntityList()){
-            //第二层循环按选择器层次结构遍历选择器
-            for(String selector : elementEntity.getSelectorList()){
-                tempElements = new Elements();
-                //第三层循环，利用遍历到的选择器从上次获取到的元素列表中获取下一层的元素
-                for(Element element : elements){
-                    tempElements.addAll(element.select(selector));
-                }
-                elements = tempElements;
-            }
-            //里面两次遍历结束之后，获取到的就是第n个需要爬取的元素的列表
-            //之后我们就根据handleAction来处理这些元素
-            if(elements.size() == 0){
-                continue;
-            }
-            switch (elementEntity.getHandleAction()){
-                case getTag:doGetTag(elements);break;
-                case redirectTo:doRedirectTo(elements,responseEntity);break;
-                case download:doDownload(elements,responseEntity,elementEntity.getDownloadFolderPath());break;
-                default:break;
-            }
+        Elements elements = doc.select(taskEntity.getSelector());
+        //之后我们就根据handleAction来处理这些元素
+        if(elements.size() == 0){
+            return;
+        }
+        switch (taskEntity.getElementHandleAction()){
+            case getTag:doGetTag(elements);break;
+            case download:doDownload(elements,responseEntity,taskEntity.getDownloadFolderPath());break;
+            default:break;
         }
     }
 
-    private void HandleAsJSON(DefaultConfigEntity configEntity,ResponseEntity responseEntity){
+    private void GetContent(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
         //TODO 因为存在response的content中不完全是JSON的情况，就先把conten写到文件中
         File file = new File("C:\\Users\\Administrator\\Desktop\\scrip.txt");
         OutputStreamWriter writer = null;
+
         try {
             writer = new FileWriter(file,false);
             writer.write(responseEntity.getContent());
@@ -89,8 +84,9 @@ public class DefaultCrawler implements ICrawlerfj {
         }
     }
 
-    private void doRedirectTo(Elements elements,ResponseEntity resEntity) {
-        //TODO
+    private void Redirect(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity) {
+        Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
+        Elements elements = doc.select(taskEntity.getSelector());
     }
 
     private void doDownload(Elements elements,ResponseEntity resEntity,String folderPath){
