@@ -9,11 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultConfigEntity {
     //对response进行操作的任务列表
-    private ArrayList<TaskEntity> taskList = null;
+    private List<TaskEntity> taskList = null;
 
     //爬取的url
     private String url = null;
@@ -30,8 +31,12 @@ public class DefaultConfigEntity {
     //对内容进行处理的function，这个主要是针对JSON内容的，例如用这个function抠出合法的JSON部分
     private ContentFormatter contentFormatter = null;
 
-    public ArrayList<TaskEntity> getTaskList() {
+    public List<TaskEntity> getTaskList() {
         return taskList;
+    }
+
+    public void setTaskList(List<TaskEntity> taskList) {
+        this.taskList = taskList;
     }
 
     public void addTask(TaskEntity entity){
@@ -95,7 +100,19 @@ public class DefaultConfigEntity {
         private Const.taskType taskType = null;
 
         //任务列表，在当前任务是重定向时使用，指明重定向后要执行的任务
-        private ArrayList<TaskEntity> taskList = null;
+        private List<TaskEntity> taskList = null;
+
+        //自定义请求头，在当前任务是重定向时使用
+        private Map<String,String> requestHeader = null;
+
+        //自定义请求类型，在当前任务是重定向时使用
+        private DefaultRequest.Method method = null;
+
+        //自定义请求参数，在当前任务是重定向时使用
+        private Map<String,String> param = null;
+
+        //对内容进行处理的function，这个主要是针对JSON内容的，例如用这个function抠出合法的JSON部分
+        private ContentFormatter contentFormatter = null;
 
         //选择器,在getHtmlElement时使用，格式与jquery的选择器格式相同
         private String selector = null;
@@ -138,12 +155,44 @@ public class DefaultConfigEntity {
             this.downloadFolderPath = downloadFolderPath;
         }
 
-        public ArrayList<TaskEntity> getTaskList() {
+        public List<TaskEntity> getTaskList() {
             return taskList;
         }
 
-        protected void setTaskList(ArrayList<TaskEntity> taskList){
+        protected void setTaskList(List<TaskEntity> taskList){
             this.taskList = taskList;
+        }
+
+        public DefaultRequest.Method getMethod() {
+            return method;
+        }
+
+        protected void setMethod(DefaultRequest.Method method) {
+            this.method = method;
+        }
+
+        public Map<String, String> getParam() {
+            return param;
+        }
+
+        protected void setParam(Map<String, String> param) {
+            this.param = param;
+        }
+
+        public Map<String, String> getRequestHeader() {
+            return requestHeader;
+        }
+
+        protected void setRequestHeader(Map<String, String> requestHeader) {
+            this.requestHeader = requestHeader;
+        }
+
+        public ContentFormatter getContentFormatter() {
+            return contentFormatter;
+        }
+
+        protected void setContentFormatter(ContentFormatter contentFormatter) {
+            this.contentFormatter = contentFormatter;
         }
 
         //验证每个TaskEntity的合法性

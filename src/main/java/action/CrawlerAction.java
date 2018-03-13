@@ -54,14 +54,13 @@ public class CrawlerAction {
 
 
 
-            /*这个是爬图片的*/
+            /*这个是爬小说的*/
             DefaultConfigEntity.TaskEntity taskEntity;
-            configEntity.setUrl("http://www.xgyw.cc/YouMi/8202.html");
-//            htmlCrawlerConfigBuilder.setUrl("http://www.comicool.cn/content/reader.html?comic_id=12485&ep_id=19&update_weekday=0");
+            configEntity.setUrl("https://www.readnovel.com/chapter/8031300604386003/24857884854778500");
             configEntity.setMethod(DefaultRequest.Method.GET);
             getHtmlElementTaskBuilder.setDownloadFolderPath("C:\\Users\\Administrator\\Desktop\\img");
-            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.download);
-            getHtmlElementTaskBuilder.setSelector("p img");
+            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.getTag);
+            getHtmlElementTaskBuilder.setSelector(".read-content.j_readContent");
             configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
 
             doRedirectTaskBuilder.setSelector(".page a");

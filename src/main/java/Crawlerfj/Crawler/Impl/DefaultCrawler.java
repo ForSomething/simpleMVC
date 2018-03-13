@@ -36,13 +36,26 @@ public class DefaultCrawler implements ICrawlerfj {
             }
             for(DefaultConfigEntity.TaskEntity task : configEntity.getTaskList()){
                 switch (task.getTaskType()){
-                    case redirect:redirectTaskList.add(task);break; //将充定向的任务放入列表中，在后面统一处理
+                    case redirect:redirectTaskList.add(task);break; //将重定向的任务放入列表中，放在最后处理
                     case getContent: GetContent(task,responseEntity);break;
                     case getHtmlElement: GetHtmlElement(task,responseEntity);
                 }
             }
             for(DefaultConfigEntity.TaskEntity task : redirectTaskList){
-                Redirect(task,responseEntity);
+                Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
+                Elements elements = doc.select(task.getSelector());
+
+                for(Element element : elements){
+                    String url = element.attr("href");
+                    DefaultConfigEntity newConfigEntity = new DefaultConfigEntity();
+                    newConfigEntity.setUrl(url);
+                    newConfigEntity.setMethod(task.getMethod());
+                    newConfigEntity.setParam(task.getParam());
+                    newConfigEntity.setRequestHeader(task.getRequestHeader());
+                    newConfigEntity.setTaskList(task.getTaskList());
+                    newConfigEntity.setContentFormatter(task.getContentFormatter());
+                    Crawling(newConfigEntity);
+                }
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -84,11 +97,6 @@ public class DefaultCrawler implements ICrawlerfj {
         }
     }
 
-    private void Redirect(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity) {
-        Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
-        Elements elements = doc.select(taskEntity.getSelector());
-    }
-
     private void doDownload(Elements elements,ResponseEntity resEntity,String folderPath){
         File folder = new File(folderPath);
         if(!folder.exists()){
@@ -127,7 +135,7 @@ public class DefaultCrawler implements ICrawlerfj {
         File file = new File("C:\\Users\\Administrator\\Desktop\\test.txt");
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(file,false);
+            fileOutputStream = new FileOutputStream(file,true);
             for(Element element : elements){
                 fileOutputStream.write((element.outerHtml() + "\n").getBytes("utf-8"));
             }
