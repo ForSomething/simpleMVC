@@ -1,6 +1,7 @@
 package Crawlerfj.Crawler.Impl;
 
 import Crawlerfj.Config.DefaultConfig.DefaultConfigEntity;
+import Crawlerfj.CrawlQueue.CrawlQueueHandler;
 import Crawlerfj.Crawler.ICrawlerfj;
 import Crawlerfj.Entity.AttachmentEntity;
 import Crawlerfj.Entity.ResponseEntity;
@@ -36,29 +37,30 @@ public class DefaultCrawler implements ICrawlerfj {
             }
             for(DefaultConfigEntity.TaskEntity task : configEntity.getTaskList()){
                 switch (task.getTaskType()){
-                    case redirect:redirectTaskList.add(task);break; //将重定向的任务放入列表中，放在最后处理
+                    case redirect:HandleRedirectTask(task,responseEntity);break;
                     case getContent: GetContent(task,responseEntity);break;
                     case getHtmlElement: GetHtmlElement(task,responseEntity);
                 }
             }
-            for(DefaultConfigEntity.TaskEntity task : redirectTaskList){
-                Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
-                Elements elements = doc.select(task.getSelector());
-
-                for(Element element : elements){
-                    String url = element.attr("href");
-                    DefaultConfigEntity newConfigEntity = new DefaultConfigEntity();
-                    newConfigEntity.setUrl(url);
-                    newConfigEntity.setMethod(task.getMethod());
-                    newConfigEntity.setParam(task.getParam());
-                    newConfigEntity.setRequestHeader(task.getRequestHeader());
-                    newConfigEntity.setTaskList(task.getTaskList());
-                    newConfigEntity.setContentFormatter(task.getContentFormatter());
-                    Crawling(newConfigEntity);
-                }
-            }
         }catch(Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private void HandleRedirectTask(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
+        //将重定向任务转成一个configEntity，放入配置项队列中，作为一个新的爬取任务来处理
+        Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
+        Elements elements = doc.select(taskEntity.getSelector());
+        for(Element element : elements){
+            String url = element.attr("href");
+            DefaultConfigEntity newConfigEntity = new DefaultConfigEntity();
+            newConfigEntity.setUrl(url);
+            newConfigEntity.setMethod(taskEntity.getMethod());
+            newConfigEntity.setParam(taskEntity.getParam());
+            newConfigEntity.setRequestHeader(taskEntity.getRequestHeader());
+            newConfigEntity.setTaskList(taskEntity.getTaskList());
+            newConfigEntity.setContentFormatter(taskEntity.getContentFormatter());
+            CrawlQueueHandler.GetInstance().PutConfigEntityIntoQueue(newConfigEntity);
         }
     }
 

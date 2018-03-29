@@ -1,6 +1,7 @@
 package Crawlerfj.Proxy;
 
 
+import Crawlerfj.CrawlQueue.CrawlThreadManager;
 import Crawlerfj.Crawler.ICrawlerfj;
 import Crawlerfj.Crawler.Impl.DefaultCrawler;
 
@@ -17,6 +18,8 @@ public class DefaultCrawlerProxy {
         defaultCrawlerList = new ArrayList<ICrawlerfj>();
         defaultCrawlerList.add(new DefaultCrawler());
         customCrawlerList = new ArrayList<ICrawlerfj>();
+        //在此时启动线程来处理爬取队列中的爬取任务
+        CrawlThreadManager.GetInstance().StartAllThread();
     }
 
     private static DefaultCrawlerProxy instance = new DefaultCrawlerProxy();

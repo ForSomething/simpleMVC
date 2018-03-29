@@ -55,16 +55,30 @@ public class CrawlerAction {
 
 
             /*这个是爬小说的*/
-            DefaultConfigEntity.TaskEntity taskEntity;
-            configEntity.setUrl("https://www.readnovel.com/chapter/8031300604386003/24857884854778500");
+//            DefaultConfigEntity.TaskEntity taskEntity;
+//            configEntity.setUrl("https://www.readnovel.com/chapter/8031300604386003/24857884854778500");
+//            configEntity.setMethod(DefaultRequest.Method.GET);
+//            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.getTag);
+//            getHtmlElementTaskBuilder.setSelector(".read-content.j_readContent");
+//            configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
+//
+//            doRedirectTaskBuilder.setSelector(".page a");
+//            doRedirectTaskBuilder.AddTask(getHtmlElementTaskBuilder.CreateTaskEntity());
+//            configEntity.addTask(doRedirectTaskBuilder.CreateTaskEntity());
+
+
+
+            /*尝试爬新华网*/
+            configEntity.setUrl("http://www.xinhuanet.com/world/2018-02/02/c_1122361569.htm");
             configEntity.setMethod(DefaultRequest.Method.GET);
-            getHtmlElementTaskBuilder.setDownloadFolderPath("C:\\Users\\Administrator\\Desktop\\img");
             getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.getTag);
-            getHtmlElementTaskBuilder.setSelector(".read-content.j_readContent");
+            getHtmlElementTaskBuilder.setSelector(".article");
             configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
 
-            doRedirectTaskBuilder.setSelector(".page a");
+            doRedirectTaskBuilder.setSelector(".nextpage");
+            doRedirectTaskBuilder.setMethod(DefaultRequest.Method.GET);
             doRedirectTaskBuilder.AddTask(getHtmlElementTaskBuilder.CreateTaskEntity());
+            doRedirectTaskBuilder.AddTask(doRedirectTaskBuilder.CreateTaskEntity());
             configEntity.addTask(doRedirectTaskBuilder.CreateTaskEntity());
 
 

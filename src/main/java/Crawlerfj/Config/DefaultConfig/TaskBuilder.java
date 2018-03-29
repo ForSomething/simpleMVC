@@ -132,6 +132,7 @@ public class TaskBuilder {
 
         public DefaultConfigEntity.TaskEntity CreateTaskEntity(){
             DefaultConfigEntity.TaskEntity entity = new DefaultConfigEntity.TaskEntity();
+            entity.setSelector(selector);
             entity.setTaskType(Const.taskType.redirect);
             entity.setTaskList(taskList);
             entity.setRequestHeader(requestHeader);
