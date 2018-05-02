@@ -1,5 +1,6 @@
 package Crawlerfj.Crawler.Impl;
 
+import Crawlerfj.Config.DefaultConfig.CrawlingTask;
 import Crawlerfj.Config.DefaultConfig.DefaultConfigEntity;
 import Crawlerfj.CrawlQueue.CrawlQueueHandler;
 import Crawlerfj.Crawler.ICrawlerfj;
@@ -24,7 +25,7 @@ public class DefaultCrawler implements ICrawlerfj {
     }
 
     public void Crawling(Object _configEntity) {
-        LinkedList<DefaultConfigEntity.TaskEntity> redirectTaskList = new LinkedList<DefaultConfigEntity.TaskEntity>();
+        LinkedList<CrawlingTask> redirectTaskList = new LinkedList<CrawlingTask>();
         try{
             DefaultConfigEntity configEntity = (DefaultConfigEntity)_configEntity;
             DefaultRequest requestHandler = DefaultRequest.GetInstance();
@@ -35,7 +36,7 @@ public class DefaultCrawler implements ICrawlerfj {
             if(configEntity.getContentFormatter() != null){
                 responseEntity.setContent(configEntity.getContentFormatter().execute(responseEntity.getContent()));
             }
-            for(DefaultConfigEntity.TaskEntity task : configEntity.getTaskList()){
+            for(CrawlingTask task : configEntity.getTaskList()){
                 switch (task.getTaskType()){
                     case redirect:HandleRedirectTask(task,responseEntity);break;
                     case getContent: GetContent(task,responseEntity);break;
@@ -47,7 +48,7 @@ public class DefaultCrawler implements ICrawlerfj {
         }
     }
 
-    private void HandleRedirectTask(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
+    private void HandleRedirectTask(CrawlingTask taskEntity, ResponseEntity responseEntity){
         //将重定向任务转成一个configEntity，放入配置项队列中，作为一个新的爬取任务来处理
         Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
         Elements elements = doc.select(taskEntity.getSelector());
@@ -64,7 +65,7 @@ public class DefaultCrawler implements ICrawlerfj {
         }
     }
 
-    private void GetHtmlElement(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
+    private void GetHtmlElement(CrawlingTask taskEntity, ResponseEntity responseEntity){
         Document doc = Jsoup.parse(responseEntity.getContent(),responseEntity.getBaseUrl());
         Elements elements = doc.select(taskEntity.getSelector());
         //之后我们就根据handleAction来处理这些元素
@@ -78,7 +79,7 @@ public class DefaultCrawler implements ICrawlerfj {
         }
     }
 
-    private void GetContent(DefaultConfigEntity.TaskEntity taskEntity, ResponseEntity responseEntity){
+    private void GetContent(CrawlingTask taskEntity, ResponseEntity responseEntity){
         //TODO 因为存在response的content中不完全是JSON的情况，就先把conten写到文件中
         File file = new File("C:\\Users\\Administrator\\Desktop\\scrip.txt");
         OutputStreamWriter writer = null;
