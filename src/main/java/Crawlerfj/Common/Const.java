@@ -11,4 +11,9 @@ public class Const {
         getContent,
         redirect
     }
+
+    public enum requestMethod{
+        GET,
+        POST
+    }
 }

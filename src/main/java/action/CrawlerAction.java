@@ -1,11 +1,9 @@
 package action;
 
-import Crawlerfj.Common.StringUtil;
-import Crawlerfj.Config.DefaultConfig.DefaultConfigEntity;
-import Crawlerfj.Exception.ConfigIllegalException;
+import Crawlerfj.Config.LibaiwuConfig;
 import Crawlerfj.Proxy.DefaultCrawlerProxy;
-import Crawlerfj.Request.DefaultRequest;
 import Util.Const;
+import Util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +12,6 @@ import service.CrawlerService;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/crawler")
@@ -26,12 +23,6 @@ public class CrawlerAction {
     @ResponseBody
     public String Test(){
         String errStr = StringUtil.emptyString;
-        DefaultCrawlerProxy proxy = DefaultCrawlerProxy.GetInstance();
-        Map<String,String> requestHeader = new HashMap<String, String>();
-        TaskBuilder.GetContentTaskBuilder getContentTaskBuilder = TaskBuilder.CreateGetContentTaskBuilder();
-        TaskBuilder.GetHtmlElementTaskBuilder getHtmlElementTaskBuilder = TaskBuilder.CreateGetHtmlElementTaskBuilder();
-        TaskBuilder.DoRedirectTaskBuilder doRedirectTaskBuilder = TaskBuilder.CreateDoRedirectTaskBuilder();
-        DefaultConfigEntity configEntity = new DefaultConfigEntity();
         try {
 
             /*这个是爬京东优惠券列表的*/
@@ -48,43 +39,8 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-
-
-
-            /*这个是爬小说的*/
-//            DefaultConfigEntity.TaskEntity taskEntity;
-//            configEntity.setUrl("https://www.readnovel.com/chapter/8031300604386003/24857884854778500");
-//            configEntity.setMethod(DefaultRequest.Method.GET);
-//            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.getTag);
-//            getHtmlElementTaskBuilder.setSelector(".read-content.j_readContent");
-//            configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
-//
-//            doRedirectTaskBuilder.setSelector(".page a");
-//            doRedirectTaskBuilder.AddTask(getHtmlElementTaskBuilder.CreateTaskEntity());
-//            configEntity.addTask(doRedirectTaskBuilder.CreateTaskEntity());
-
-
-
-            /*尝试爬新华网*/
-            configEntity.setUrl("http://www.xinhuanet.com/world/2018-02/02/c_1122361569.htm");
-            configEntity.setMethod(DefaultRequest.Method.GET);
-            getHtmlElementTaskBuilder.setElementHandleAction(Crawlerfj.Common.Const.elementHandleAction.getTag);
-            getHtmlElementTaskBuilder.setSelector(".article");
-            configEntity.addTask(getHtmlElementTaskBuilder.CreateTaskEntity());
-
-            doRedirectTaskBuilder.setSelector(".nextpage");
-            doRedirectTaskBuilder.setMethod(DefaultRequest.Method.GET);
-            doRedirectTaskBuilder.AddTask(getHtmlElementTaskBuilder.CreateTaskEntity());
-            doRedirectTaskBuilder.AddTask(doRedirectTaskBuilder.CreateTaskEntity());
-            configEntity.addTask(doRedirectTaskBuilder.CreateTaskEntity());
-
-
-
-
-            proxy.Crawling(configEntity);
-        } catch (ConfigIllegalException e) {
-            errStr = e.getMessage();
-        }catch (Exception e){
+            LibaiwuConfig.ExecuteByConfig();
+        } catch (Exception e){
             errStr = e.getMessage();
         }
         if(!StringUtil.IsNullOrWihtespace(errStr)){

@@ -2,21 +2,13 @@ package Crawlerfj.Request;
 
 
 import Crawlerfj.Common.Regex;
-import Crawlerfj.Common.StringUtil;
-import Crawlerfj.Entity.AttachmentEntity;
-import Crawlerfj.Entity.ResponseEntity;
-import Util.HttpHelper;
+import Util.HttpUtil.HttpUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.util.ByteArrayBuffer;
-import org.apache.http.util.EntityUtils;
+import Util.HttpUtil.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Date;
-import java.util.Map;
 
 public class DefaultRequest {
     private static DefaultRequest instance = new DefaultRequest();
@@ -25,21 +17,17 @@ public class DefaultRequest {
         return instance;
     }
 
-    public enum Method {
-        GET,POST
-    }
-
     private DefaultRequest(){}
 
-    public ResponseEntity doRequest(Method method, String url,Map<String,String> header,Map<String,String> param) throws IOException {
+    public ResponseEntity doRequest(RequestEntity requestEntity) throws IOException {
         HttpResponse response;
-        switch (method){
-            case GET: response = HttpHelper.doGet(url,header);break;
-            case POST:response = HttpHelper.doPost(url,header,param);break;
+        switch (requestEntity.getRequestMethod()){
+            case GET: response = HttpUtil.doGet(requestEntity);break;
+            case POST:response = HttpUtil.doPost(requestEntity);break;
             default: response = null;
         }
         if(response != null){
-            ResponseEntity entity = null;
+            ResponseEntity responseEntity = null;
             if(response.getStatusLine().getStatusCode() == 301){
                 //如果状态code是301，说明需要重定向
                 Header[] headers = response.getHeaders("Location");
@@ -50,52 +38,34 @@ public class DefaultRequest {
 //                    entity = doRequest(method,redirectUrl,param);
                 }
             }else{
-                entity = new ResponseEntity();
-                entity.setStateCode(response.getStatusLine().getStatusCode());
-                entity.setBaseUrl(url);
-                entity.setContent(EntityUtils.toString(response.getEntity(),"utf-8"));
+                InputStream responseIS = response.getEntity().getContent();
+                int bufferSize = 1024;
+                byte[] content = new byte[0];
+                byte[] buffer = new byte[bufferSize];
+                while (true){
+                    int count = responseIS.read(buffer);
+                    if(count <= 0){
+                        break;
+                    }
+                    byte[] newArray = new byte[content.length + count];
+                    System.arraycopy(content,0,newArray,0,content.length);
+                    System.arraycopy(buffer,0,newArray,content.length,count);
+                    content = newArray;
+                }
+                responseEntity = new ResponseEntity();
+                responseEntity.setStateCode(response.getStatusLine().getStatusCode());
+                responseEntity.setBaseUrl(requestEntity.getRequestURL());
+                responseEntity.setContent(content);
                 //先从http头中获取域名，如果获取不到，则用正则表达式从url中抠出域名
                 Header[] headers = response.getHeaders("Host");
                 if(headers != null && headers.length > 0){
-                    entity.setDomain(headers[0].getValue());
+                    responseEntity.setDomain(headers[0].getValue());
                 }else{
-                    entity.setDomain(Regex.getDomain(url));
+                    responseEntity.setDomain(Regex.getDomain(requestEntity.getRequestURL()));
                 }
             }
-            return entity;
+            return responseEntity;
         }
         return null;
-    }
-
-    public AttachmentEntity getAttachment(String url) throws IOException {
-        AttachmentEntity attachmentEntity = new AttachmentEntity();
-        HttpResponse response = HttpHelper.doGet(url,null);
-        Header[] headers = response.getHeaders("Content-Disposition");
-        if(headers != null && headers.length > 0){
-
-        }else{
-            Date data = new Date();
-            attachmentEntity.setFileName(String.valueOf(data.getTime()));
-        }
-        String contentType = response.getEntity().getContentType().getValue();
-        if(!StringUtil.IsNullOrWihtespace(contentType)){
-            String[] typeArr = contentType.split("/");
-            attachmentEntity.setFileType(typeArr.length > 1 ? typeArr[1] : StringUtil.emptyString);
-        }
-        int size = (int)response.getEntity().getContentLength();
-        //如果获取不到ContentLength，则将ByteArrayBuffer的初始大小设置成4096
-        if(size < 0){
-            size = 4096;
-        }
-        ByteArrayBuffer byteArrayBuffer = new ByteArrayBuffer(size);
-        byte[] tmp = new byte[1024];
-        InputStream inputStream = response.getEntity().getContent();
-
-        int l;
-        while((l = inputStream.read(tmp)) != -1) {
-            byteArrayBuffer.append(tmp, 0, l);
-        }
-        attachmentEntity.setContent(byteArrayBuffer.toByteArray());
-        return attachmentEntity;
     }
 }

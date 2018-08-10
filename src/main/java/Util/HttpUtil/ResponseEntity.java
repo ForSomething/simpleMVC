@@ -1,20 +1,24 @@
-package Crawlerfj.Entity;
+package Util.HttpUtil;
+
+import java.util.Map;
 
 public class ResponseEntity {
     private int stateCode;
 
     private String baseUrl;
 
-    private String content;
+    private byte[] content;
 
     private String domain;
+
+    private Map<String,String> responseHeaderMap;
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
-    public void setContent(String contentHtml) {
-        this.content = contentHtml;
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
     public void setDomain(String domain) {
@@ -25,6 +29,10 @@ public class ResponseEntity {
         this.stateCode = stateCode;
     }
 
+    public void setResponseHeaderMap(Map<String, String> responseHeaderMap) {
+        this.responseHeaderMap = responseHeaderMap;
+    }
+
     public int getStateCode() {
         return stateCode;
     }
@@ -33,11 +41,15 @@ public class ResponseEntity {
         return baseUrl;
     }
 
-    public String getContent() {
+    public byte[] getContent() {
         return content;
     }
 
     public String getDomain() {
         return domain;
+    }
+
+    public Map<String, String> getResponseHeaderMap() {
+        return responseHeaderMap;
     }
 }

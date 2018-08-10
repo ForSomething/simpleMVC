@@ -8,8 +8,7 @@ public class Regex {
     private static String getDomainRegex = "//[^/]{1,}";
 
     public static String getDomain(String url){
-        Pattern pattern = Pattern.compile(getDomainRegex);
-        Matcher matcher = pattern.matcher(url);
+        Matcher matcher = Pattern.compile(getDomainRegex).matcher(url);
         if(matcher.find()){
             return matcher.group(0).substring(2); //去掉前面的//
         }
