@@ -127,7 +127,6 @@ public class RequestEntity {
     public static class BrowserConfig{
         private BrowserVersion browserVersion = null;
 
-        //TODO 这个地方应该是配置的
         private long waitForJSRenderingTime = 0;
 
         public BrowserVersion getBrowserVersion() {

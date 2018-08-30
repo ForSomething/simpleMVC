@@ -1,13 +1,17 @@
 package Util.HttpUtil;
 
+import Crawlerfj.Common.Regex;
+import Util.StringUtils;
 import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +22,7 @@ public class HttpUtils {
         BrowserVersion.setDefault(BrowserVersion.CHROME);
     }
 
-    public static HttpResponse doGet(RequestEntity requestEntity) throws IOException {
+    public static ResponseEntity doGet(RequestEntity requestEntity) throws IOException {
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         CloseableHttpClient httpClient = clientBuilder.build();
         HttpGet httpGet = new HttpGet(requestEntity.getRequestURL());
@@ -29,21 +33,40 @@ public class HttpUtils {
                 httpGet.setHeader(key,requestHeaderMap.get(key));
             }
         }
-        return httpClient.execute(httpGet);
+        HttpResponse response = httpClient.execute(httpGet);
+        ResponseEntity responseEntity = new ResponseEntity();
+        responseEntity.setStateCode(response.getStatusLine().getStatusCode());
+        responseEntity.setBaseUrl(requestEntity.getRequestURL());
+        responseEntity.setContent(ReadInputStreamIntoByteArray(response.getEntity().getContent()));
+        //先从http头中获取域名，如果获取不到，则用正则表达式从url中抠出域名
+        Header[] headers = response.getHeaders("Host");
+        if(headers != null && headers.length > 0){
+            responseEntity.setDomain(headers[0].getValue());
+        }else{
+            responseEntity.setDomain(Regex.getDomain(requestEntity.getRequestURL()));
+        }
+
+        Map<String,String> responseHeaderMap = new HashMap<>();
+        headers = response.getAllHeaders();
+        for(Header header : headers){
+            responseHeaderMap.put(header.getName(),header.getValue());
+        }
+        responseEntity.setResponseHeaderMap(responseHeaderMap);
+        return responseEntity;
     }
 
-    public static HttpResponse doPost(RequestEntity requestEntity) throws IOException {
+    public static ResponseEntity doPost(RequestEntity requestEntity) throws IOException {
         return null;
     }
 
-    public static WebResponse doGetByBrowser(RequestEntity requestEntity) throws IOException {
+    public static ResponseEntity doGetByBrowser(RequestEntity requestEntity) throws IOException {
         WebClient webClient;
         if(requestEntity.getBrowserConfig() != null && requestEntity.getBrowserConfig().getBrowserVersion() != null){
             //按照用户配置生成一个浏览器客户端对象
-            webClient = InitWebClient(requestEntity.getBrowserConfig().getBrowserVersion());
+            webClient = InitWebClient(requestEntity.getBrowserConfig().getBrowserVersion(),requestEntity.getBrowserConfig().getWaitForJSRenderingTime());
         }else{
             //生成一个默认的浏览器对象
-            webClient = InitWebClient(null);
+            webClient = InitWebClient(null,requestEntity.getBrowserConfig().getWaitForJSRenderingTime());
         }
         //加入自定义的请求头
         Map<String,String> requestHeaderMap;
@@ -61,17 +84,33 @@ public class HttpUtils {
             }
         }
 
-        Page page = webClient.getPage(requestEntity.getRequestURL());
-        //先阻塞在这里，等待js渲染
-        webClient.waitForBackgroundJavaScript(requestEntity.getBrowserConfig().getWaitForJSRenderingTime());
-        return page.getWebResponse();
+        //获取页面
+        WebResponse response = webClient.getPage(requestEntity.getRequestURL()).getWebResponse();
+        ResponseEntity responseEntity = new ResponseEntity();
+        responseEntity.setStateCode(response.getStatusCode());
+        responseEntity.setBaseUrl(requestEntity.getRequestURL());
+        responseEntity.setContent(ReadInputStreamIntoByteArray(response.getContentAsStream()));
+        //先从http头中获取域名，如果获取不到，则用正则表达式从url中抠出域名
+        String domain = response.getResponseHeaderValue("Host");
+        if(StringUtils.IsNullOrEmpty(domain)){
+            responseEntity.setDomain(Regex.getDomain(requestEntity.getRequestURL()));
+        }else{
+            responseEntity.setDomain(domain);
+        }
+
+        Map<String,String> responseHeaderMap = new HashMap<>();
+        for(NameValuePair one : response.getResponseHeaders()){
+            responseHeaderMap.put(one.getName(),one.getValue());
+        }
+        responseEntity.setResponseHeaderMap(responseHeaderMap);
+        return responseEntity;
     }
 
-    public static WebResponse doPostByBrowser(RequestEntity requestEntity) throws IOException {
+    public static ResponseEntity doPostByBrowser(RequestEntity requestEntity) throws IOException {
         return null;
     }
 
-    private static WebClient InitWebClient(BrowserVersion browserVersion){
+    private static WebClient InitWebClient(BrowserVersion browserVersion,long waitForJS){
         WebClient webClient;
         if(browserVersion != null){
             //按照用户配置生成一个浏览器客户端对象
@@ -80,12 +119,32 @@ public class HttpUtils {
             //生成一个默认的浏览器对象
             webClient = new WebClient(BrowserVersion.getDefault());
         }
+        webClient.getOptions().setTimeout(30000);//设置“浏览器”的请求超时时间
         webClient.getOptions().setThrowExceptionOnScriptError(false);//当JS执行出错的时候是否抛出异常, 这里选择不需要
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);//当HTTP的状态非200时是否抛出异常, 这里选择不需要
-        webClient.getOptions().setActiveXNative(false);
         webClient.getOptions().setCssEnabled(false);//是否启用CSS, 因为不需要展现页面, 所以不需要启用
         webClient.getOptions().setJavaScriptEnabled(true); //很重要，启用JS
-        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//很重要，设置支持AJAX
+        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//很重要，设置支持AJAX，这个的作用是告诉浏览器在ajax结束后重新同步异步的XHR
+        webClient.waitForBackgroundJavaScript(waitForJS);//设置JS后台等待执行时间
+        webClient.setJavaScriptTimeout(waitForJS);//设置JS执行的超时时间
+
         return webClient;
+    }
+
+    private static byte[] ReadInputStreamIntoByteArray(InputStream inputStream) throws IOException {
+        int bufferSize = 1024;
+        byte[] content = new byte[0];
+        byte[] buffer = new byte[bufferSize];
+        while (true){
+            int count = inputStream.read(buffer);
+            if(count <= 0){
+                break;
+            }
+            byte[] newArray = new byte[content.length + count];
+            System.arraycopy(content,0,newArray,0,content.length);
+            System.arraycopy(buffer,0,newArray,content.length,count);
+            content = newArray;
+        }
+        return content;
     }
 }
