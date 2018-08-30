@@ -1,9 +1,8 @@
 package action;
 
-import Crawlerfj.Config.LibaiwuConfig;
-import Crawlerfj.Proxy.DefaultCrawlerProxy;
+import Crawlerfj.Config.*;
 import Util.Const;
-import Util.StringUtil;
+import Util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import service.CrawlerService;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 @Controller
 @RequestMapping(path = "/crawler")
@@ -22,7 +20,7 @@ public class CrawlerAction {
     @RequestMapping(path = "/test")
     @ResponseBody
     public String Test(){
-        String errStr = StringUtil.emptyString;
+        String errStr = StringUtils.emptyString;
         try {
 
             /*这个是爬京东优惠券列表的*/
@@ -39,11 +37,11 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            LibaiwuConfig.ExecuteByConfig();
+            NenmwConfig.ExecuteByConfig();
         } catch (Exception e){
             errStr = e.getMessage();
         }
-        if(!StringUtil.IsNullOrWihtespace(errStr)){
+        if(!StringUtils.IsNullOrWihtespace(errStr)){
             return errStr;
         }
         return "start crawling!";

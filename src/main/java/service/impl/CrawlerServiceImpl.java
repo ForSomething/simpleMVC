@@ -2,7 +2,7 @@ package service.impl;
 
 
 import Util.Const;
-import Util.StringUtil;
+import Util.StringUtils;
 import dao.CrawlerDao;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,14 +34,14 @@ public class CrawlerServiceImpl implements CrawlerService {
         String outterHTML;
         for(Element one : elements){
             outterHTML = one.html();
-            fileOutputStream.write(StringUtil.GetByteArray(outterHTML,"UTF-8"));
+            fileOutputStream.write(StringUtils.GetByteArray(outterHTML,"UTF-8"));
         }
         fileOutputStream.close();
         return resultStr;
     }
 
     public String getSearchListInfo(String searchPath) throws IOException {
-//        HttpResponse response = Util.HttpUtil.doGet(searchPath);
+//        HttpResponse response = Util.HttpUtils.doGet(searchPath);
 //        if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //            HttpEntity entity = response.getEntity();
 //            if(entity != null){
@@ -67,7 +67,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 //        FileOutputStream fileOutputStream = new FileOutputStream(file,false);
 //        for(String itemPath : itemPathList){
 //            String itemID = itemPath.replace("https://item.jd.com/","").replace(".html","");
-//            HttpResponse response = Util.HttpUtil.doGet(itemPath);
+//            HttpResponse response = Util.HttpUtils.doGet(itemPath);
 //            if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //                HttpEntity entity = response.getEntity();
 //                if(entity != null){
@@ -83,7 +83,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 //                        outterHTML += one.html() + "    (" + itemID + ")    ";
 //                        outterHTML += "(价格：" + getPrice(itemID) + ")\r\n";
 //                    }
-//                    fileOutputStream.write(StringUtil.GetByteArray(outterHTML));
+//                    fileOutputStream.write(StringUtils.GetByteArray(outterHTML));
 //                }
 //            }
 //        }
@@ -94,7 +94,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private String getPrice(String itemID) throws IOException {
 //        String urlStr = Const.jdPriceURLStr.replace("%%ii%%",itemID);
-//        HttpResponse response = Util.HttpUtil.doGet(urlStr);
+//        HttpResponse response = Util.HttpUtils.doGet(urlStr);
 //        if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //            HttpEntity entity = response.getEntity();
 //            if(entity != null){

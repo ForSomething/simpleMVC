@@ -4,7 +4,7 @@ import Crawlerfj.Crawler.Impl.SingleStepCrawler.SingleStep;
 import Crawlerfj.Crawler.Impl.SingleStepCrawler.SingleStepConfig;
 import Crawlerfj.Proxy.DefaultCrawlerProxy;
 import Util.HttpUtil.RequestEntity;
-import Util.FileUtil;
+import Util.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -34,7 +34,7 @@ public class LibaiwuConfig {
                     if(!innserHTMLStr.startsWith("<"))
                         pList.add(e.html());
                 }
-                FileUtil.GetInstance().WriteLines(pList.toArray(new String[0]),"C:\\Users\\Administrator\\Desktop\\hehehe.txt");
+                FileUtils.GetInstance().WriteLines(pList.toArray(new String[0]),"C:\\Users\\Administrator\\Desktop\\hehehe.txt");
                 //这个网站反爬虫，但是每次请求之间只要等待个几秒就行了
                 Thread.sleep(2000);
                 String nextPageUrl = document.selectFirst("[rel=next]").attr("href");

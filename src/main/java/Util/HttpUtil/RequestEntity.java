@@ -1,6 +1,7 @@
 package Util.HttpUtil;
 
 import Crawlerfj.Common.Const;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,8 @@ public class RequestEntity {
     private Map<String,String> cookieMap = null;
 
     private Const.requestMethod requestMethod = null;
+
+    private BrowserConfig browserConfig = null;
 
     public String getRequestURL() {
         return requestURL;
@@ -34,6 +37,10 @@ public class RequestEntity {
 
     public Const.requestMethod getRequestMethod() {
         return requestMethod;
+    }
+
+    public BrowserConfig getBrowserConfig() {
+        return browserConfig;
     }
 
     public void setRequestURL(String requestURL) {
@@ -77,6 +84,10 @@ public class RequestEntity {
         }
     }
 
+    public void setBrowserConfig(BrowserConfig browserConfig) {
+        this.browserConfig = browserConfig;
+    }
+
     public void RemoveRequestHeader(String key){
         if(requestHeaderMap != null && requestHeaderMap.containsKey(key)){
             requestHeaderMap.remove(key);
@@ -110,6 +121,29 @@ public class RequestEntity {
     public void ClearCookie(){
         if(cookieMap != null){
             cookieMap.clear();
+        }
+    }
+
+    public static class BrowserConfig{
+        private BrowserVersion browserVersion = null;
+
+        //TODO 这个地方应该是配置的
+        private long waitForJSRenderingTime = 0;
+
+        public BrowserVersion getBrowserVersion() {
+            return browserVersion;
+        }
+
+        public long getWaitForJSRenderingTime() {
+            return waitForJSRenderingTime;
+        }
+
+        public void setBrowserVersion(BrowserVersion browserVersion) {
+            this.browserVersion = browserVersion;
+        }
+
+        public void setWaitForJSRenderingTime(long waitForJSRenderingTime) {
+            this.waitForJSRenderingTime = waitForJSRenderingTime;
         }
     }
 }

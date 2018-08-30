@@ -2,10 +2,10 @@ package Util;
 
 import java.io.*;
 
-public class FileUtil {
-    private static FileUtil instance = new FileUtil();
+public class FileUtils {
+    private static FileUtils instance = new FileUtils();
 
-    public static FileUtil GetInstance(){
+    public static FileUtils GetInstance(){
         return instance;
     }
 

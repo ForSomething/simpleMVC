@@ -2,7 +2,7 @@ package Util;
 
 import java.io.UnsupportedEncodingException;
 
-public class StringUtil {
+public class StringUtils {
     static public String emptyString = "";
 
     static public byte[] GetByteArray(String str,String charsetName) throws UnsupportedEncodingException {
