@@ -45,7 +45,8 @@ public class HttpUtils {
         }else{
             responseEntity.setDomain(Regex.getDomain(requestEntity.getRequestURL()));
         }
-
+        //获取协议
+        responseEntity.setProtocol(response.getProtocolVersion().getProtocol());
         Map<String,String> responseHeaderMap = new HashMap<>();
         headers = response.getAllHeaders();
         for(Header header : headers){
@@ -85,7 +86,8 @@ public class HttpUtils {
         }
 
         //获取页面
-        WebResponse response = webClient.getPage(requestEntity.getRequestURL()).getWebResponse();
+        Page page = webClient.getPage(requestEntity.getRequestURL());
+        WebResponse response = page.getWebResponse();
         ResponseEntity responseEntity = new ResponseEntity();
         responseEntity.setStateCode(response.getStatusCode());
         responseEntity.setBaseUrl(requestEntity.getRequestURL());
@@ -97,6 +99,7 @@ public class HttpUtils {
         }else{
             responseEntity.setDomain(domain);
         }
+        responseEntity.setProtocol(page.getUrl().getProtocol());
 
         Map<String,String> responseHeaderMap = new HashMap<>();
         for(NameValuePair one : response.getResponseHeaders()){

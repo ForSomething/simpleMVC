@@ -54,8 +54,8 @@ public class SingleStepCrawler extends ICrawlerfj {
         if(SingleStepConfigPool.containsKey(serialNumber)){
             SingleStepConfigPool.replace(serialNumber,config);
         }else {
-        SingleStepConfigPool.put(serialNumber,config);
-    }
+            SingleStepConfigPool.put(serialNumber,config);
+        }
         singleStepPoolLock.unlock();
     }
 

@@ -9,12 +9,12 @@ public class FileUtils {
         return instance;
     }
 
-    public void WriteLines(String[] lines, String fileName){
+    public void WriteLines(String[] lines, String fileName,boolean append){
         fileName = fileName.replace("/","\\");
-        CreateFolder(fileName.substring(0,fileName.lastIndexOf('\\')));
+        CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
         BufferedWriter bufferedWriter = null;
         try {
-            bufferedWriter = new BufferedWriter(new FileWriter(fileName,true));
+            bufferedWriter = new BufferedWriter(new FileWriter(fileName,append));
             for(String text : lines){
                 bufferedWriter.write(text);
                 bufferedWriter.newLine();
@@ -26,12 +26,12 @@ public class FileUtils {
         }
     }
 
-    public void WriteBinaryData(byte[] data,String fileName){
+    public void WriteBinaryData(byte[] data,String fileName,boolean append){
         fileName = fileName.replace("/","\\");
-        CreateFolder(fileName.substring(0,fileName.lastIndexOf('\\')));
+        CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
         BufferedOutputStream bos = null;
         try {
-            bos = new BufferedOutputStream(new FileOutputStream(fileName));
+            bos = new BufferedOutputStream(new FileOutputStream(fileName,append));
             bos.write(data);
             bos.flush();
             bos.close();
@@ -40,8 +40,14 @@ public class FileUtils {
         }
     }
 
-    private void CreateFolder(String folderName){
+    public String[] ReadLinesFromFile(){
+        return null;
+    }
+
+    private void CreateFolderIfNotExists(String folderName){
         File file = new File(folderName);
-        file.mkdirs();
+        if(!file.exists()) {
+            file.mkdirs();
+        }
     }
 }

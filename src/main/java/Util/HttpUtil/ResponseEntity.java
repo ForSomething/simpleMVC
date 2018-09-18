@@ -11,6 +11,8 @@ public class ResponseEntity {
 
     private String domain;
 
+    private String protocol;
+
     private Map<String,String> responseHeaderMap;
 
     public void setBaseUrl(String baseUrl) {
@@ -51,5 +53,13 @@ public class ResponseEntity {
 
     public Map<String, String> getResponseHeaderMap() {
         return responseHeaderMap;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }

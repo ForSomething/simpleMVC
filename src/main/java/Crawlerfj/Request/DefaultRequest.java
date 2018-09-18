@@ -45,7 +45,6 @@ public class DefaultRequest {
         if(response == null){
             return null;
         }
-        ResponseEntity responseEntity = null;
         if(response.getStateCode() == 301){
             //TODO 如果状态code是301，说明需要重定向
 //            Header[] headers = response.getHeaders("Location");
@@ -56,7 +55,7 @@ public class DefaultRequest {
 //                    entity = doRequest(method,redirectUrl,param);
 //            }
         }
-        return responseEntity;
+        return response;
     }
 
     private static ResponseEntity doRequestByBrowser(RequestEntity requestEntity) throws IOException {
