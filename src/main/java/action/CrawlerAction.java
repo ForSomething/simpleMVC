@@ -37,7 +37,7 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            NenmwConfig.ExecuteByConfig();
+            SexiConfig.ExecuteByConfig();
         } catch (Exception e){
             errStr = e.getMessage();
         }

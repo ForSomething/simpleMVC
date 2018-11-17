@@ -1,17 +1,16 @@
 package Crawlerfj.Crawler.Impl.SingleStepCrawler;
 
 import Crawlerfj.Crawler.ICrawlerfj;
+import Util.FileUtils;
 import Util.HttpUtil.RequestEntity;
 import Util.HttpUtil.ResponseEntity;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SingleStepCrawler extends ICrawlerfj {
     private ThreadPoolExecutor threadPoolExecutor;
@@ -37,7 +36,7 @@ public class SingleStepCrawler extends ICrawlerfj {
         threadPoolExecutor.execute(new StepExecuteRunnable(config,this));
     }
 
-    private ResponseEntity DoRequestBySupper(RequestEntity requestEntity) throws IOException {
+    private ResponseEntity DoRequestBySuper(RequestEntity requestEntity) throws IOException {
         return super.DoRequest(requestEntity);
     }
 
@@ -54,8 +53,22 @@ public class SingleStepCrawler extends ICrawlerfj {
         @Override
         public void run() {
             try {
-                singleStepConfig.getSingleStep().Execute(crawler.DoRequestBySupper(singleStepConfig.getRequestEntity()),singleStepConfig);
-            } catch (IOException e) {
+//                String uuid = UUID.randomUUID().toString().replace("-","");
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//                String timeString = sdf.format(System.currentTimeMillis());
+//                String logString = String.format("[%s] [%s]开始爬取，url为[%s]",timeString,uuid,singleStepConfig.getRequestEntity().getRequestURL());
+//                FileUtils.GetInstance().WriteLines(new String[]{logString},"C:\\Users\\Administrator\\Desktop\\crawlerLog.txt",true);
+                if(singleStepConfig.getBeforeCrawlingHandler() != null){
+                    singleStepConfig.getBeforeCrawlingHandler().Excute(singleStepConfig);
+                }
+                singleStepConfig.getSingleStep().Execute(crawler.DoRequestBySuper(singleStepConfig.getRequestEntity()),singleStepConfig);
+                if(singleStepConfig.getAfterCrawlingHandler() != null){
+                    singleStepConfig.getAfterCrawlingHandler().Excute(singleStepConfig);
+                }
+//                timeString = sdf.format(System.currentTimeMillis());
+//                logString = String.format("[%s] [%s]爬取完成",timeString,uuid,singleStepConfig.getRequestEntity().getRequestURL());
+//                FileUtils.GetInstance().WriteLines(new String[]{logString},"C:\\Users\\Administrator\\Desktop\\crawlerLog.txt",true);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

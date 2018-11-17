@@ -87,6 +87,8 @@ public class HttpUtils {
 
         //获取页面
         Page page = webClient.getPage(requestEntity.getRequestURL());
+        //等待一段时间，让js有时间执行
+        webClient.waitForBackgroundJavaScript(requestEntity.getBrowserConfig().getWaitForJSRenderingTime());
         WebResponse response = page.getWebResponse();
         ResponseEntity responseEntity = new ResponseEntity();
         responseEntity.setStateCode(response.getStatusCode());
@@ -125,11 +127,14 @@ public class HttpUtils {
         webClient.getOptions().setTimeout(30000);//设置“浏览器”的请求超时时间
         webClient.getOptions().setThrowExceptionOnScriptError(false);//当JS执行出错的时候是否抛出异常, 这里选择不需要
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);//当HTTP的状态非200时是否抛出异常, 这里选择不需要
-        webClient.getOptions().setCssEnabled(false);//是否启用CSS, 因为不需要展现页面, 所以不需要启用
+        webClient.getOptions().setCssEnabled(true);//是否启用CSS, 有些js会计算css相关东西，所以是true
+        webClient.getOptions().setDownloadImages(true);//是否下载图片，最好还是下载，做得和真的浏览器一样最好
         webClient.getOptions().setJavaScriptEnabled(true); //很重要，启用JS
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());//很重要，设置支持AJAX，这个的作用是告诉浏览器在ajax结束后重新同步异步的XHR
-        webClient.waitForBackgroundJavaScript(waitForJS);//设置JS后台等待执行时间
-        webClient.setJavaScriptTimeout(waitForJS);//设置JS执行的超时时间
+        webClient.getOptions().setScreenHeight(1080);
+        webClient.getOptions().setScreenWidth(1920);
+//        webClient.waitForBackgroundJavaScript(waitForJS);//设置JS后台等待执行时间
+//        webClient.setJavaScriptTimeout(waitForJS);//设置JS执行的超时时间
 
         return webClient;
     }

@@ -1,6 +1,10 @@
 package Crawlerfj.Crawler.Impl.SingleStepCrawler;
 
+import Common.EventHandlerInterface.BaseEventHandler;
 import Util.HttpUtil.RequestEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SingleStepConfig {
@@ -8,13 +12,18 @@ public class SingleStepConfig {
 
     private SingleStep singleStep = null;
 
-    private Object userParam;
+    private Map<String,Object> userParam;
+
+    BaseEventHandler beforeCrawlingHandler;
+
+    BaseEventHandler afterCrawlingHandler;
 
     public SingleStepConfig(){
-
+        userParam = new HashMap<>();
     }
 
     public SingleStepConfig(RequestEntity requestEntity,SingleStep singleStep){
+        this();
         this.requestEntity = requestEntity;
         this.singleStep = singleStep;
     }
@@ -27,8 +36,8 @@ public class SingleStepConfig {
         return singleStep;
     }
 
-    public <T> T getUserParam() {
-        return (T)userParam;
+    public <T> T getUserParam(String key) {
+        return (T)userParam.get(key);
     }
 
     public void setSingleStep(SingleStep singleStep) {
@@ -39,7 +48,27 @@ public class SingleStepConfig {
         this.requestEntity = requestEntity;
     }
 
-    public <T> void setUserParam(T userParam) {
-        this.userParam = userParam;
+    public <T> void setUserParam(String key,T userParam) {
+        if(this.userParam.containsKey(key)){
+            this.userParam.replace(key,userParam);
+        }else{
+            this.userParam.put(key,userParam);
+        }
+    }
+
+    public BaseEventHandler getBeforeCrawlingHandler() {
+        return beforeCrawlingHandler;
+    }
+
+    public void setBeforeCrawlingHandler(BaseEventHandler beforeCrawlingHandler) {
+        this.beforeCrawlingHandler = beforeCrawlingHandler;
+    }
+
+    public BaseEventHandler getAfterCrawlingHandler() {
+        return afterCrawlingHandler;
+    }
+
+    public void setAfterCrawlingHandler(BaseEventHandler afterCrawlingHandler) {
+        this.afterCrawlingHandler = afterCrawlingHandler;
     }
 }
