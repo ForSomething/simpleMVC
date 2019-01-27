@@ -1,15 +1,24 @@
 package action;
 
-import Crawlerfj.Config.*;
-import Util.Const;
-import Util.StringUtils;
+import com.google.gson.JsonObject;
+import crawlerfj.crawlercase.MzituConfig;
+import crawlerfj.crawlercase.dataentity.Chapter;
+import crawlerfj.crawlercase.huhumh.HuhumhConfig;
+import toolroom.FileUtils;
+import toolroom.JsonUtils;
+import toolroom.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import service.CrawlerService;
 
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/crawler")
@@ -37,7 +46,8 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            SexiConfig.ExecuteByConfig();
+            MzituConfig.ExecuteByConfig();
+//            Chapter.load("396590a910d04771b1a29e49a8591c25");
         } catch (Exception e){
             errStr = e.getMessage();
         }
@@ -47,23 +57,41 @@ public class CrawlerAction {
         return "start crawling!";
     }
 
-    @RequestMapping(path = "/getImg")
+    @RequestMapping(path = "/getChapter")
     @ResponseBody
-    public String getImg(String path){
-        try {
-            return crawlerService.doCrawler("https://item.jd.com/2953318.html");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
+    public void getChapter(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HashMap<String,String> cond = new HashMap<>();
+        cond.put("ID",request.getParameter("ID"));
+        cond.put("parentID",request.getParameter("parentID"));
+        List<Object> dataList = new LinkedList();
+        for(Chapter chapter : Chapter.load(cond)){
+            Map<String,Object> data = new HashMap<>();
+            dataList.add(data);
+            data.put("id",chapter.getId());
+            data.put("text",chapter.getChapterName());
+            data.put("value",chapter.getChapterContent());
+            Map<String,Object> disMap = new HashMap<>();
+            if(JsonUtils.tryParseJsonString2Map(chapter.getRemark(),disMap)){
+                data.put("remark",disMap);
+            }else{
+                data.put("remark",chapter.getRemark());
+            }
         }
+        response.getWriter().write(JsonUtils.parse2Json(dataList));
     }
 
-    @RequestMapping(path = "/getPrice")
+    @RequestMapping(path = "/getChapterContent")
     @ResponseBody
-    public String getPrice(String keyWord){
+    public String getChapterContent(HttpServletRequest request){
         try {
-            return crawlerService.getSearchListInfo(Const.jdSearchURLStr.replace("%%kw%%",keyWord));
-        } catch (IOException e) {
+            String currentPath = request.getParameterMap().keySet().iterator().next();
+            String[] lines = FileUtils.GetInstance().ReadLinesFromFile(currentPath);
+            StringBuilder returnStringBuilder = new StringBuilder();
+            for(String line : lines){
+                returnStringBuilder.append(String.format("<tr><td><img src=\"%s\"></td></tr>",line));
+            }
+            return returnStringBuilder.toString();
+        } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
         }

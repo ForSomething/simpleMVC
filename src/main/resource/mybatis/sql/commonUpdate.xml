@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="dao.MybatisBase">
+    <parameterMap id="parameterMap" type="HashMap">
+        <parameter property="" ></parameter>
+    </parameterMap>
+    <update id="commonUpdate">
+        ${}
+
+
+
+
+        INSERT INTO BX_LOAN (bkno,cur_date,loan_id,apply_date,start_date,end_date,clear_date,encash_amt,currency,repay_mode,repay_cycle,total_terms,cur_term,
+        repay_day,grace_day,prin_total,prin_repay,prin_bal,ovd_prin_bal,int_total,int_repay,int_bal,ovd_int_bal,pnlt_int_total,pnlt_int_repay,pnlt_int_bal,
+        fund_fee_total,fund_fee_repay,loan_status,loan_form,partner_loan_id,charges_total,charges_repay,overdue_total,overdue_repay,repay_violate_total,
+        repay_violate_repay,refund_violate_total,refund_violate_repay,service_total,service_repay,inst_rate)
+        SELECT * FROM(
+        <foreach collection="list" item="item" separator="UNION ALL">
+            SELECT
+            #{item.bkno},#{item.cur_date},#{item.loan_id},#{item.apply_date},#{item.start_date},#{item.end_date},#{item.clear_date},#{item.encash_amt},#{item.currency},
+            #{item.repay_mode},#{item.repay_cycle},#{item.total_terms},#{item.cur_term},#{item.repay_day},#{item.grace_day},#{item.prin_total},
+            #{item.prin_repay},#{item.prin_bal},#{item.ovd_prin_bal},#{item.int_total},#{item.int_repay},#{item.int_bal},#{item.ovd_int_bal},#{item.pnlt_int_total},
+            #{item.pnlt_int_repay},#{item.pnlt_int_bal},#{item.fund_fee_total},#{item.fund_fee_repay},#{item.loan_status},#{item.loan_form},#{item.partner_loan_id},
+            #{item.charges_total},#{item.charges_repay},#{item.overdue_total},#{item.overdue_repay},#{item.repay_violate_total},#{item.repay_violate_repay},
+            #{item.refund_violate_total},#{item.refund_violate_repay},#{item.service_total},#{item.service_repay},#{item.inst_rate}
+            FROM dual
+        </foreach>)
+    </update>
+</mapper>
