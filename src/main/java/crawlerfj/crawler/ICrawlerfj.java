@@ -10,7 +10,7 @@ public abstract class ICrawlerfj {
     abstract public void Crawling(Object _config) throws Exception;
 
     protected ResponseEntity DoRequest(RequestEntity requestEntity) throws Exception {
-        if(requestEntity.getBrowserConfig() != null){
+        if(requestEntity.getBrowserConfig() == null){
             switch (requestEntity.getRequestMethod()){
                 case GET: return HttpUtils.doGet(requestEntity);
                 case POST: return HttpUtils.doPost(requestEntity);
