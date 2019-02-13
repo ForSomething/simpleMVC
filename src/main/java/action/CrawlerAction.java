@@ -1,7 +1,5 @@
 package action;
 
-import com.google.gson.JsonObject;
-import crawlerfj.crawlercase.MzituConfig;
 import crawlerfj.crawlercase.dataentity.Chapter;
 import crawlerfj.crawlercase.huhumh.HuhumhConfig;
 import toolroom.FileUtils;
@@ -46,7 +44,7 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            MzituConfig.ExecuteByConfig();
+            HuhumhConfig.ExecuteByConfig();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
         } catch (Exception e){
             errStr = e.getMessage();
