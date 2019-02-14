@@ -12,6 +12,7 @@ public class BrowserCrawler extends ICrawlerfj {
     static {
         String browserDriverPath = System.getProperty("webdriver.chrome.driver");
         if(browserDriverPath == null){
+            // TODO 找个地方配置一下
             System.setProperty("webdriver.chrome.driver","C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         }
         driverDispatchPool = new DispatchPool(5){
@@ -34,15 +35,10 @@ public class BrowserCrawler extends ICrawlerfj {
     public void Crawling(Object _config) throws Exception {
         BrowserCrawlerConfig browserCrawlerConfig = (BrowserCrawlerConfig)_config;
         super.executeThread(()->{
-            // TODO 这里要进行异常处理
-            try {
-                driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
-                    browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance((WebDriver) freeItem));
-                    return null;
-                });
-            }catch (InterruptedException e){
-
-            }
+            driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
+                browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance((WebDriver) freeItem));
+                return null;
+            });
         });
     }
 

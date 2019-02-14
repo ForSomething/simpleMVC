@@ -16,17 +16,21 @@ public abstract class DispatchPool<T> {
         freeInstanceStackPoint = poolSize - 1;
     }
 
-    public Object ExecuteWithFreeInstance(TheTask task) throws InterruptedException {
+    public Object ExecuteWithFreeInstance(TheTask task){
         T freeInstance = GetFreeInstance();
         Object result = task.Execute(freeInstance);
         GiveBackFreeInstance(freeInstance);
         return result;
     }
 
-    private synchronized T GetFreeInstance() throws InterruptedException {
-        if(freeInstanceStackPoint == -1){
-            //如果栈顶指针没有指向任何栈内元素，说明栈内所有元素都处于忙的状态，此时调用wait方法
-            this.wait();
+    private synchronized T GetFreeInstance(){
+        try{
+            if(freeInstanceStackPoint == -1){
+                //如果栈顶指针没有指向任何栈内元素，说明栈内所有元素都处于忙的状态，此时调用wait方法
+                this.wait();
+            }
+        }catch (InterruptedException e){
+            //理论上不会出现这个异常
         }
         return instancePool[freeInstanceStackPoint--];
     }
