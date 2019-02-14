@@ -1,23 +1,18 @@
 package crawlerfj.crawlercase.huhumh;
 
 import common.eventhandlerinterface.BaseEventHandler;
-import common.pool.DispatchPool;
 import crawlerfj.common.Const;
+import crawlerfj.crawler.CrawlerProxy;
 import crawlerfj.crawler.Impl.SingleStepCrawler.SingleStep;
 import crawlerfj.crawler.Impl.SingleStepCrawler.SingleStepConfig;
 import crawlerfj.crawlercase.dataentity.Chapter;
 import crawlerfj.crawlercase.dataentity.Error;
-import crawlerfj.proxy.DefaultCrawlerProxy;
 import toolroom.httputil.RequestEntity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,12 +38,11 @@ public class HuhumhConfig {
         init();
         SingleStepConfig startUpConfig = new SingleStepConfig();
         startUpConfig.setRequestEntity(new RequestEntity());
-        startUpConfig.getRequestEntity().setBrowserConfig(new RequestEntity.BrowserConfig());
         startUpConfig.getRequestEntity().setRequestURL("http://www.huhumh.com/huhu8211.html");
         startUpConfig.getRequestEntity().setRequestMethod(Const.requestMethod.GET);
         startUpConfig.setSingleStep(chapterListPagingStep);
         startUpConfig.setExceptionHandler(exceptionHandler);
-        DefaultCrawlerProxy.GetInstance().Crawling(startUpConfig);
+        CrawlerProxy.Crawling(startUpConfig);
     }
 
     private static void init(){
@@ -144,7 +138,7 @@ public class HuhumhConfig {
                         chapterContentConfig.setUserParam("parentID",chapterID);
                         chapterContentConfig.setBeforeCrawlingHandler(sleepBeforeCrawling);
                         chapterContentConfig.setExceptionHandler(exceptionHandler);
-                        DefaultCrawlerProxy.GetInstance().Crawling(chapterContentConfig);
+                        CrawlerProxy.Crawling(chapterContentConfig);
                     }
                     chapterType = "unkown";
                 }

@@ -36,7 +36,7 @@ public class BrowserCrawler extends ICrawlerfj {
         BrowserCrawlerConfig browserCrawlerConfig = (BrowserCrawlerConfig)_config;
         super.executeThread(()->{
             driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
-                browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance((WebDriver) freeItem));
+                browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance(freeItem));
                 return null;
             });
         });

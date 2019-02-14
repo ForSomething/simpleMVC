@@ -15,6 +15,10 @@ public abstract class ICrawlerfj {
         threadPoolExecutor = new ThreadPoolExecutor(50,50,1, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
     }
 
+    protected ICrawlerfj(){
+        CrawlerProxy.registerCrawler(this);
+    }
+
     abstract public boolean CanHandle(Object _config);
 
     abstract public void Crawling(Object _config) throws Exception;
