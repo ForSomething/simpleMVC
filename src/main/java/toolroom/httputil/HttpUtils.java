@@ -1,22 +1,14 @@
 package toolroom.httputil;
 
-import common.pool.DispatchPool;
 import crawlerfj.common.Regex;
-import toolroom.StringUtils;
-import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 

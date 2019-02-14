@@ -49,8 +49,6 @@ public class BrowserCrawler extends ICrawlerfj {
     private class BrowserInstance implements BrowserCrawlerConfig.Browser{
         private WebDriver driver;
 
-        private String pageContent;
-
         protected BrowserInstance(WebDriver driver){
             this.driver = driver;
         }
