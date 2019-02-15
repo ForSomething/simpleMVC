@@ -15,7 +15,7 @@ public class BrowserCrawler extends ICrawlerfj {
             // TODO 找个地方配置一下
             System.setProperty("webdriver.chrome.driver","C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         }
-        driverDispatchPool = new DispatchPool(5){
+        driverDispatchPool = new DispatchPool(10){
 
             @Override
             protected Object NewInstance() {
@@ -35,10 +35,19 @@ public class BrowserCrawler extends ICrawlerfj {
     public void Crawling(Object _config) throws Exception {
         BrowserCrawlerConfig browserCrawlerConfig = (BrowserCrawlerConfig)_config;
         super.executeThread(()->{
-            driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
-                browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance(freeItem));
-                return null;
-            });
+            try {
+                driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
+                    browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance(freeItem),browserCrawlerConfig);
+                    return null;
+                });
+            }catch (Exception e){
+                if(browserCrawlerConfig.getExceptionHandler() != null){
+                    browserCrawlerConfig.setUserParam("exception",e);
+                    browserCrawlerConfig.getExceptionHandler().Excute(browserCrawlerConfig);
+                }else{
+                    System.out.println(e.getMessage());
+                }
+            }
         });
     }
 

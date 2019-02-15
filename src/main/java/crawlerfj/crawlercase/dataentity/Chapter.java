@@ -14,13 +14,13 @@ public class Chapter extends BaseDataEntity {
     String remark;
     Integer indexNum;
 
-    public Chapter(String id,String parentID,String chapterName,String chapterContent,String remark){
+    public Chapter(String id,String parentID,String chapterName,String chapterContent,String remark,Integer indexNum){
         this.id = id;
         this.parentID = parentID;
         this.chapterName = chapterName;
         this.chapterContent = chapterContent;
         this.remark = remark;
-        // TODO 这里少了一个序号
+        this.indexNum = indexNum;
     }
 
     public Chapter(){

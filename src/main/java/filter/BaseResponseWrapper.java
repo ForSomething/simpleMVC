@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.*;
 
 public class BaseResponseWrapper extends HttpServletResponseWrapper {
-    private CharArrayWriter writer;
-    private ByteArrayOutputStream outputStream;
+    private CharArrayWriter writer = new CharArrayWriter();
+    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     public BaseResponseWrapper(HttpServletResponse response) {
         super(response);
@@ -24,13 +24,11 @@ public class BaseResponseWrapper extends HttpServletResponseWrapper {
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        writer = new CharArrayWriter();
         return new PrintWriter(writer);
     }
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        outputStream = new ByteArrayOutputStream();
         return new OutputStreamWrapper(outputStream);
     }
 

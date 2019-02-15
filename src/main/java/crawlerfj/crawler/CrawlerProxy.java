@@ -1,10 +1,18 @@
 package crawlerfj.crawler;
 
+import crawlerfj.crawler.Impl.SingleStepCrawler.SingleStepCrawler;
+import crawlerfj.crawler.Impl.browsercrawler.BrowserCrawler;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class CrawlerProxy {
     private static List<ICrawlerfj> crawlerList = new LinkedList<>();
+
+    static {
+        crawlerList.add(SingleStepCrawler.GetInstance());
+        crawlerList.add(new BrowserCrawler());
+    }
 
     public static void Crawling(Object config) throws Exception{
         ICrawlerfj crawler = null;

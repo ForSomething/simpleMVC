@@ -25,7 +25,7 @@ public abstract class DispatchPool<T> {
 
     private synchronized T GetFreeInstance(){
         try{
-            if(freeInstanceStackPoint == -1){
+            while (freeInstanceStackPoint == -1){
                 //如果栈顶指针没有指向任何栈内元素，说明栈内所有元素都处于忙的状态，此时调用wait方法
                 this.wait();
             }
@@ -37,8 +37,8 @@ public abstract class DispatchPool<T> {
 
     private synchronized void GiveBackFreeInstance(T instance){
         instancePool[++freeInstanceStackPoint] = instance;
-        //如果有元素被换回来了，就通知所有wait的线程
-        this.notifyAll();
+        //如果有元素被还回来了，就通知一条wait的线程
+        this.notify();
     }
 
     protected abstract T NewInstance();
