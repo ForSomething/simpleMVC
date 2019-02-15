@@ -41,7 +41,7 @@ public class HuhumhConfig {
     private static void init(){
         exceptionHandler = parameter -> {
             try {
-                SingleStepConfig theConfig = (SingleStepConfig)parameter;
+                BrowserCrawlerConfig theConfig = (BrowserCrawlerConfig)parameter;
                 Integer retryTimes = theConfig.getUserParam("retryTimes");
                 retryTimes = retryTimes == null ? 0 : retryTimes;
                 theConfig.setUserParam("retryTimes",retryTimes);
@@ -53,7 +53,7 @@ public class HuhumhConfig {
                     new Error(new Timestamp(System.currentTimeMillis()),errorMessage,null).insert();
                 }
             }catch (Exception e){
-
+                System.out.println("异常处理方法里出现异常，e为：" + e.getMessage());
             }
         };
 
@@ -91,6 +91,7 @@ public class HuhumhConfig {
                     pageIndex++;
                 }
             }catch (Exception e){
+                System.out.println("浏览器任务出现异常，e为：" + e.toString());
                 config.setUserParam("exception",e);
                 exceptionHandler.Excute(config);
             }
