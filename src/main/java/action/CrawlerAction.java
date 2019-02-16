@@ -83,7 +83,7 @@ public class CrawlerAction {
     public String getChapterContent(HttpServletRequest request){
         try {
             String currentPath = request.getParameterMap().keySet().iterator().next();
-            String[] lines = FileUtils.GetInstance().ReadLinesFromFile(currentPath);
+            String[] lines = FileUtils.ReadLinesFromFile(currentPath);
             StringBuilder returnStringBuilder = new StringBuilder();
             for(String line : lines){
                 returnStringBuilder.append(String.format("<tr><td><img src=\"%s\"></td></tr>",line));

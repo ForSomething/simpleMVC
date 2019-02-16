@@ -2,10 +2,9 @@ package crawlerfj.crawlercase.dataentity;
 
 import annotation.Table;
 
-import java.util.HashMap;
 import java.util.List;
 
-@Table(table = "chapter_tree")
+@Table(table = "chapter_tree", sortColumns = "indexNum")
 public class Chapter extends BaseDataEntity {
     String id;
     String parentID;

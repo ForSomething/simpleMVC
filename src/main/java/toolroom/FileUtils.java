@@ -4,13 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class FileUtils {
-    private static FileUtils instance = new FileUtils();
-
-    public static FileUtils GetInstance(){
-        return instance;
-    }
-
-    public void WriteLines(String[] lines, String fileName,boolean append) throws IOException {
+    public static void WriteLines(String[] lines, String fileName,boolean append) throws IOException {
         fileName = fileName.replace("/","\\");
         CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName,append));
@@ -22,11 +16,11 @@ public class FileUtils {
         bufferedWriter.close();
     }
 
-    public void WriteLine(String line, String fileName,boolean append) throws IOException {
+    public static void WriteLine(String line, String fileName,boolean append) throws IOException {
         WriteLines(new String[]{line},fileName,append);
     }
 
-    public void WriteBinaryData(byte[] data, String fileName, boolean append) throws IOException {
+    public static void WriteBinaryData(byte[] data, String fileName, boolean append) throws IOException {
         fileName = fileName.replace("/","\\");
         CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fileName,append));
@@ -35,7 +29,7 @@ public class FileUtils {
         bos.close();
     }
 
-    public String[] ReadLinesFromFile(String fileName) throws IOException {
+    public static String[] ReadLinesFromFile(String fileName) throws IOException {
         fileName = fileName.replace("/","\\");
         File file = new File(fileName);
         if(!file.exists()){
@@ -50,7 +44,7 @@ public class FileUtils {
         return lines.toArray(new String[1]);
     }
 
-    private void CreateFolderIfNotExists(String folderName){
+    private static void CreateFolderIfNotExists(String folderName){
         File file = new File(folderName);
         if(!file.exists()) {
             file.mkdirs();

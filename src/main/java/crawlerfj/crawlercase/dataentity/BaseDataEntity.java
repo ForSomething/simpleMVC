@@ -74,10 +74,17 @@ public class BaseDataEntity {
     protected static <T extends BaseDataEntity> List<T> select(Object cond,Class<T> entityClass) throws Exception{
         Map condMap;
         List<Object> parameters = new LinkedList<>();
-        String tableName;
-        if(!entityClass.isAnnotationPresent(Table.class) || StringUtils.IsNullOrWihtespace((tableName = ((Table)entityClass.getAnnotation(Table.class)).table()))){
-            //如果类未被Table注解标注，或者注解的table值是空字符串，则用类名作为表名,否则用table值作为表名
-            tableName = entityClass.getSimpleName();
+        String tableName = entityClass.getSimpleName();
+        String sortColumns = StringUtils.emptyString;
+        if(entityClass.isAnnotationPresent(Table.class)){
+            //如果类被Table注解标注
+            Table tableAnnotation = entityClass.getAnnotation(Table.class);
+            if(!StringUtils.IsNullOrWihtespace(tableAnnotation.table())){
+                //注解指明了表名，则用注解中的表名
+                tableName = tableAnnotation.table();
+            }
+            //排序列
+            sortColumns = tableAnnotation.sortColumns();
         }
         StringBuilder sqlBilder = new StringBuilder("select * from ").append(tableName);
         if(cond != null){
@@ -112,7 +119,7 @@ public class BaseDataEntity {
                     condIndex++;
                 }
             }
-            sqlBilder.append(" order by indexNum");// TODO 这个应该也是注解配置的
+            sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
         }
         List<Map<String,Object>> resultList = MysqlUtils.ExecuteQuerySql(sqlBilder.toString(),parameters);
         List<T> resultBeanList = new LinkedList<>();
