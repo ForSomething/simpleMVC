@@ -1,6 +1,7 @@
 package crawlerfj.crawler.Impl.SingleStepCrawler;
 
 import crawlerfj.crawler.ICrawlerfj;
+import toolroom.httputil.HttpUtils;
 import toolroom.httputil.RequestEntity;
 import toolroom.httputil.ResponseEntity;
 
@@ -9,12 +10,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class SingleStepCrawler extends ICrawlerfj {
-    private ThreadPoolExecutor threadPoolExecutor;
-
     private static SingleStepCrawler instance = new SingleStepCrawler();
 
     private SingleStepCrawler(){
-        threadPoolExecutor = new ThreadPoolExecutor(50,50,1, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+
     }
 
     public static SingleStepCrawler GetInstance(){
@@ -29,49 +28,39 @@ public class SingleStepCrawler extends ICrawlerfj {
     @Override
     public void Crawling(Object _config) throws Exception {
         SingleStepConfig config = (SingleStepConfig)_config;
-        threadPoolExecutor.execute(new StepExecuteRunnable(config,this));
-    }
-
-    private ResponseEntity DoRequestBySuper(RequestEntity requestEntity) throws Exception {
-        return super.DoRequest(requestEntity);
-    }
-
-    private class StepExecuteRunnable implements Runnable{
-        SingleStepConfig singleStepConfig;
-
-        SingleStepCrawler crawler;
-
-        public StepExecuteRunnable(SingleStepConfig singleStepConfig,SingleStepCrawler crawler){
-            this.crawler = crawler;
-            this.singleStepConfig = singleStepConfig;
-        }
-
-        @Override
-        public void run() {
+        super.executeThread(()->{
             try {
 //                String uuid = UUID.randomUUID().toString().replace("-","");
 //                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 //                String timeString = sdf.format(System.currentTimeMillis());
 //                String logString = String.format("[%s] [%s]开始爬取，url为[%s]",timeString,uuid,singleStepConfig.getRequestEntity().getRequestURL());
 //                FileUtils.GetInstance().WriteLines(new String[]{logString},"C:\\Users\\Administrator\\Desktop\\crawlerLog.txt",true);
-                if(singleStepConfig.getBeforeCrawlingHandler() != null){
-                    singleStepConfig.getBeforeCrawlingHandler().Excute(singleStepConfig);
+                if(config.getBeforeCrawlingHandler() != null){
+                    config.getBeforeCrawlingHandler().Excute(config);
                 }
-                singleStepConfig.getSingleStep().Execute(crawler.DoRequestBySuper(singleStepConfig.getRequestEntity()),singleStepConfig);
-                if(singleStepConfig.getAfterCrawlingHandler() != null){
-                    singleStepConfig.getAfterCrawlingHandler().Excute(singleStepConfig);
+                config.getSingleStep().Execute(doRequest(config.getRequestEntity()),config);
+                if(config.getAfterCrawlingHandler() != null){
+                    config.getAfterCrawlingHandler().Excute(config);
                 }
 //                timeString = sdf.format(System.currentTimeMillis());
 //                logString = String.format("[%s] [%s]爬取完成",timeString,uuid,singleStepConfig.getRequestEntity().getRequestURL());
 //                FileUtils.GetInstance().WriteLines(new String[]{logString},"C:\\Users\\Administrator\\Desktop\\crawlerLog.txt",true);
             } catch (Exception e) {
-                if(singleStepConfig.getExceptionHandler() != null){
-                    singleStepConfig.setUserParam("exception",e);
-                    singleStepConfig.getExceptionHandler().Excute(singleStepConfig);
+                if(config.getExceptionHandler() != null){
+                    config.setUserParam("exception",e);
+                    config.getExceptionHandler().Excute(config);
                 }else{
                     e.printStackTrace();
                 }
             }
+        });
+    }
+
+    private ResponseEntity doRequest(RequestEntity requestEntity) throws Exception {
+        switch (requestEntity.getRequestMethod()){
+            case GET: return HttpUtils.doGet(requestEntity);
+            case POST: return HttpUtils.doPost(requestEntity);
+            default: return null;
         }
     }
 }

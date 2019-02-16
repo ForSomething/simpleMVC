@@ -4,24 +4,26 @@ import toolroom.httputil.HttpUtils;
 import toolroom.httputil.RequestEntity;
 import toolroom.httputil.ResponseEntity;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 public abstract class ICrawlerfj {
+    private static ThreadPoolExecutor threadPoolExecutor;
+
+    static {
+        threadPoolExecutor = new ThreadPoolExecutor(50,50,1, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+    }
+
+    protected ICrawlerfj(){
+        CrawlerProxy.registerCrawler(this);
+    }
+
     abstract public boolean CanHandle(Object _config);
 
     abstract public void Crawling(Object _config) throws Exception;
 
-    protected ResponseEntity DoRequest(RequestEntity requestEntity) throws Exception {
-        if(requestEntity.getBrowserConfig() == null){
-            switch (requestEntity.getRequestMethod()){
-                case GET: return HttpUtils.doGet(requestEntity);
-                case POST: return HttpUtils.doPost(requestEntity);
-                default: return null;
-            }
-        }else{
-            switch (requestEntity.getRequestMethod()){
-                case GET: return HttpUtils.doGetByBrowser(requestEntity);
-                case POST:return HttpUtils.doPostByBrowser(requestEntity);
-                default: return null;
-            }
-        }
+    protected void executeThread(Runnable runnable){
+        threadPoolExecutor.execute(runnable);
     }
 }

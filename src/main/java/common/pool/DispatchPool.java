@@ -16,31 +16,35 @@ public abstract class DispatchPool<T> {
         freeInstanceStackPoint = poolSize - 1;
     }
 
-    public Object ExecuteWithFreeInstance(TheTask task,Object ...params) throws InterruptedException {
+    public Object ExecuteWithFreeInstance(TheTask<T> task){
         T freeInstance = GetFreeInstance();
-        Object result = task.Execute(freeInstance,params);
+        Object result = task.Execute(freeInstance);
         GiveBackFreeInstance(freeInstance);
         return result;
     }
 
-    private synchronized T GetFreeInstance() throws InterruptedException {
-        if(freeInstanceStackPoint == -1){
-            //如果栈顶指针没有指向任何栈内元素，说明栈内所有元素都处于忙的状态，此时调用wait方法
-            this.wait();
+    private synchronized T GetFreeInstance(){
+        try{
+            while (freeInstanceStackPoint == -1){
+                //如果栈顶指针没有指向任何栈内元素，说明栈内所有元素都处于忙的状态，此时调用wait方法
+                this.wait();
+            }
+        }catch (InterruptedException e){
+            //理论上不会出现这个异常
         }
         return instancePool[freeInstanceStackPoint--];
     }
 
     private synchronized void GiveBackFreeInstance(T instance){
         instancePool[++freeInstanceStackPoint] = instance;
-        //如果有元素被换回来了，就通知所有wait的线程
-        this.notifyAll();
+        //如果有元素被还回来了，就通知一条wait的线程
+        this.notify();
     }
 
     protected abstract T NewInstance();
 
     @FunctionalInterface
-    public static interface TheTask{
-        Object Execute(Object param1,Object ...otherParams);
+    public interface TheTask<T>{
+        Object Execute(T freeItem);
     }
 }

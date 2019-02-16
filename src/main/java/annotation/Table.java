@@ -12,4 +12,5 @@ public @interface Table {
 
     String table() default "";
 
+    String sortColumns() default "";
 }
