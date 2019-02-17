@@ -35,19 +35,11 @@ public class BrowserCrawler extends ICrawlerfj {
     public void Crawling(Object _config) throws Exception {
         BrowserCrawlerConfig browserCrawlerConfig = (BrowserCrawlerConfig)_config;
         super.executeThread(()->{
-            try {
-                driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
-                    browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance(freeItem),browserCrawlerConfig);
-                    return null;
-                });
-            }catch (Exception e){
-                if(browserCrawlerConfig.getExceptionHandler() != null){
-                    browserCrawlerConfig.setUserParam("exception",e);
-                    browserCrawlerConfig.getExceptionHandler().Excute(browserCrawlerConfig);
-                }else{
-                    System.out.println(e.getMessage());
-                }
-            }
+            driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
+                browserCrawlerConfig.getBrowserTask().execute(new BrowserInstance(freeItem),browserCrawlerConfig);
+                return null;
+            });
+            return null;
         });
     }
 

@@ -16,7 +16,7 @@ public abstract class DispatchPool<T> {
         freeInstanceStackPoint = poolSize - 1;
     }
 
-    public Object ExecuteWithFreeInstance(TheTask<T> task){
+    public Object ExecuteWithFreeInstance(TheTask<T> task) throws Exception{
         T freeInstance = GetFreeInstance();
         Object result = task.Execute(freeInstance);
         GiveBackFreeInstance(freeInstance);
@@ -45,6 +45,6 @@ public abstract class DispatchPool<T> {
 
     @FunctionalInterface
     public interface TheTask<T>{
-        Object Execute(T freeItem);
+        Object Execute(T freeItem) throws Exception;
     }
 }

@@ -4,5 +4,5 @@ import toolroom.httputil.ResponseEntity;
 
 @FunctionalInterface
 public interface SingleStep {
-    void Execute (ResponseEntity responseEntity, SingleStepConfig singleStepConfig);
+    void Execute (ResponseEntity responseEntity, SingleStepConfig singleStepConfig) throws Exception;
 }

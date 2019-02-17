@@ -46,7 +46,7 @@ public class BrowserCrawlerConfig {
 
     @FunctionalInterface
     public interface BrowserTask{
-        void execute(Browser browser,BrowserCrawlerConfig config);
+        void execute(Browser browser,BrowserCrawlerConfig config) throws Exception;
     }
 
     public interface Browser{
