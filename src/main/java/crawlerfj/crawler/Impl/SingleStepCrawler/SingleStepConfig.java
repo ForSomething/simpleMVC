@@ -1,34 +1,21 @@
 package crawlerfj.crawler.Impl.SingleStepCrawler;
 
 import common.eventhandlerinterface.BaseEventHandler;
+import crawlerfj.crawler.BaseCrawlerConfig;
+import toolroom.JsonUtils;
 import toolroom.httputil.RequestEntity;
 
-import java.util.HashMap;
 import java.util.Map;
 
 
-public class SingleStepConfig {
-    private RequestEntity requestEntity = null;
+public class SingleStepConfig extends BaseCrawlerConfig {
+    private RequestEntity requestEntity;
 
-    private SingleStep singleStep = null;
-
-    private Map<String,Object> userParam;
+    private SingleStep singleStep;
 
     BaseEventHandler beforeCrawlingHandler;
 
     BaseEventHandler afterCrawlingHandler;
-
-    BaseEventHandler exceptionHandler;
-
-    public SingleStepConfig(){
-        userParam = new HashMap<>();
-    }
-
-    public SingleStepConfig(RequestEntity requestEntity,SingleStep singleStep){
-        this();
-        this.requestEntity = requestEntity;
-        this.singleStep = singleStep;
-    }
 
     public RequestEntity getRequestEntity() {
         return requestEntity;
@@ -38,24 +25,12 @@ public class SingleStepConfig {
         return singleStep;
     }
 
-    public <T> T getUserParam(String key) {
-        return (T)userParam.get(key);
-    }
-
     public void setSingleStep(SingleStep singleStep) {
         this.singleStep = singleStep;
     }
 
     public void setRequestEntity(RequestEntity requestEntity) {
         this.requestEntity = requestEntity;
-    }
-
-    public <T> void setUserParam(String key,T userParam) {
-        if(this.userParam.containsKey(key)){
-            this.userParam.replace(key,userParam);
-        }else{
-            this.userParam.put(key,userParam);
-        }
     }
 
     public BaseEventHandler getBeforeCrawlingHandler() {
@@ -74,11 +49,10 @@ public class SingleStepConfig {
         this.afterCrawlingHandler = afterCrawlingHandler;
     }
 
-    public BaseEventHandler getExceptionHandler() {
-        return exceptionHandler;
-    }
-
-    public void setExceptionHandler(BaseEventHandler exceptionHandler) {
-        this.exceptionHandler = exceptionHandler;
+    @Override
+    public String toString(){
+        Map<String,Object> logMap = JsonUtils.parseJsonString2Map(super.toString());
+        logMap.put("requestEntity",requestEntity);
+        return JsonUtils.parse2Json(logMap);
     }
 }

@@ -1,5 +1,6 @@
 package crawlerfj.crawler.Impl.SingleStepCrawler;
 
+import crawlerfj.crawler.BaseCrawlerConfig;
 import crawlerfj.crawler.ICrawlerfj;
 import toolroom.httputil.HttpUtils;
 import toolroom.httputil.RequestEntity;
@@ -21,12 +22,12 @@ public class SingleStepCrawler extends ICrawlerfj {
     }
 
     @Override
-    public boolean CanHandle(Object _config) {
+    public boolean CanHandle(BaseCrawlerConfig _config) {
         return _config != null && SingleStepConfig.class.getCanonicalName().equals(_config.getClass().getCanonicalName());
     }
 
     @Override
-    public void Crawling(Object _config) {
+    public void Crawling(BaseCrawlerConfig _config) {
         SingleStepConfig config = (SingleStepConfig)_config;
         super.executeThread(()->{
             if(config.getBeforeCrawlingHandler() != null){
@@ -37,7 +38,7 @@ public class SingleStepCrawler extends ICrawlerfj {
                 config.getAfterCrawlingHandler().Excute(config);
             }
             return null;
-        });
+        },config);
     }
 
     private ResponseEntity doRequest(RequestEntity requestEntity) throws Exception {

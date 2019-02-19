@@ -1,47 +1,37 @@
 package crawlerfj.crawler.Impl.browsercrawler;
 
 import common.eventhandlerinterface.BaseEventHandler;
+import crawlerfj.crawler.BaseCrawlerConfig;
+import toolroom.JsonUtils;
 
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-public class BrowserCrawlerConfig {
+public class BrowserCrawlerConfig extends BaseCrawlerConfig {
     private BrowserTask browserTask;
 
-    private Map<String,Object> userParam;
-
-    private BaseEventHandler exceptionHandler;
-
-    public BrowserCrawlerConfig(){
-        userParam = new HashMap<>();
-    }
-
-    public <T> T getUserParam(String key) {
-        return (T)userParam.get(key);
-    }
-
-    public <T> void setUserParam(String key,T userParam) {
-        if(this.userParam.containsKey(key)){
-            this.userParam.replace(key,userParam);
-        }else{
-            this.userParam.put(key,userParam);
-        }
-    }
+    private List<String> browserHistory;
 
     public BrowserTask getBrowserTask() {
         return browserTask;
     }
 
     public void setBrowserTask(BrowserTask browserTask) {
-        this.browserTask = browserTask;
+        this.browserTask = (browser,config) -> {
+            try{
+                browserTask.execute(browser,config);
+            }finally {
+                config.browserHistory = browser.getHistory();
+            }
+        };
     }
 
-    public BaseEventHandler getExceptionHandler() {
-        return exceptionHandler;
-    }
-
-    public void setExceptionHandler(BaseEventHandler exceptionHandler) {
-        this.exceptionHandler = exceptionHandler;
+    @Override
+    public String toString(){
+        Map<String,Object> logMap = JsonUtils.parseJsonString2Map(super.toString());
+        logMap.put("browserHistory",browserHistory);
+        return JsonUtils.parse2Json(logMap);
     }
 
     @FunctionalInterface
@@ -49,11 +39,31 @@ public class BrowserCrawlerConfig {
         void execute(Browser browser,BrowserCrawlerConfig config) throws Exception;
     }
 
-    public interface Browser{
-        void toPage(String url);
+    public static abstract class Browser{
+        List<String> history = new LinkedList<>();
 
-        String getPageContent();
+        protected abstract void _toPage(String url);
 
-        void executeScript(String script);
+        public void toPage(String url){
+            history.add("to page:" + url);
+            _toPage(url);
+        }
+
+        protected abstract String _getPageContent();
+
+        public String getPageContent(){
+            return _getPageContent();
+        }
+
+        protected abstract void _executeScript(String script);
+
+        public void executeScript(String script){
+            history.add("script:" + script);
+            _executeScript(script);
+        }
+
+        protected List<String> getHistory(){
+            return history;
+        }
     }
 }

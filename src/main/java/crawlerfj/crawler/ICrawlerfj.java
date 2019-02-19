@@ -1,9 +1,12 @@
 package crawlerfj.crawler;
 
+import common.eventhandlerinterface.BaseEventHandler;
+import crawlerfj.crawlercase.dataentity.CrawlerLog;
 import toolroom.httputil.HttpUtils;
 import toolroom.httputil.RequestEntity;
 import toolroom.httputil.ResponseEntity;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,29 +26,43 @@ public abstract class ICrawlerfj {
         CrawlerProxy.registerCrawler(this);
     }
 
-    abstract public boolean CanHandle(Object _config);
+    abstract public boolean CanHandle(BaseCrawlerConfig _config);
 
-    abstract public void Crawling(Object _config) throws Exception;
+    abstract public void Crawling(BaseCrawlerConfig _config) throws Exception;
 
-    protected void executeThread(Callable callable){
-        String threadID = UUID.randomUUID().toString().replace("-","");
-        futureMap.put(threadID,threadPoolExecutor.submit(new CrawlerCallable(callable,null)));
+    protected void executeThread(Callable callable, BaseCrawlerConfig baseCrawlerConfig){
+//        String threadID = UUID.randomUUID().toString().replace("-","");
+        CrawlerCallable crawlerCallable = new CrawlerCallable(callable,baseCrawlerConfig);
+        threadPoolExecutor.submit(crawlerCallable);
+//        futureMap.put(threadID,threadPoolExecutor.submit(crawlerCallable));
     }
 
     private class CrawlerCallable implements Callable{
         Callable callable;
 
-        Thread.UncaughtExceptionHandler exceptionHandler;
+        BaseCrawlerConfig baseCrawlerConfig;
 
-        public CrawlerCallable(Callable callable, Thread.UncaughtExceptionHandler exceptionHandler){
+        public CrawlerCallable(Callable callable, BaseCrawlerConfig baseCrawlerConfig){
             this.callable = callable;
-            this.exceptionHandler = exceptionHandler;
+            this.baseCrawlerConfig = baseCrawlerConfig;
         }
 
         @Override
         public Object call() throws Exception {
-            Thread.currentThread().setUncaughtExceptionHandler(exceptionHandler);
-            return callable.call();
+            Thread.currentThread().setUncaughtExceptionHandler((thread,throwable) -> {
+                try{
+                    new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,throwable.toString(),baseCrawlerConfig.toString()).insert();
+                    if(baseCrawlerConfig.getExceptionHandler() != null){
+                        baseCrawlerConfig.getExceptionHandler().Excute(baseCrawlerConfig);
+                    }
+                }catch (Exception e){
+                    // TODO 这里不懂要怎么处理
+                    e.printStackTrace();
+                }
+            });
+            Object result = callable.call();
+            new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成",baseCrawlerConfig.toString()).insert();
+            return result;
         }
     }
 }

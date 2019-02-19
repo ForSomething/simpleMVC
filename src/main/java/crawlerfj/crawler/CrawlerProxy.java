@@ -14,7 +14,7 @@ public class CrawlerProxy {
         crawlerList.add(new BrowserCrawler());
     }
 
-    public static void Crawling(Object config) throws Exception{
+    public static void Crawling(BaseCrawlerConfig config) throws Exception{
         ICrawlerfj crawler = null;
         if(config == null){
             throw new Exception("configEntity is null");

@@ -1,10 +1,14 @@
 package crawlerfj.crawler.Impl.browsercrawler;
 
 import common.pool.DispatchPool;
+import crawlerfj.crawler.BaseCrawlerConfig;
 import crawlerfj.crawler.ICrawlerfj;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class BrowserCrawler extends ICrawlerfj {
     private static DispatchPool<WebDriver> driverDispatchPool;
@@ -27,12 +31,12 @@ public class BrowserCrawler extends ICrawlerfj {
     }
 
     @Override
-    public boolean CanHandle(Object _config) {
+    public boolean CanHandle(BaseCrawlerConfig _config) {
         return _config != null && BrowserCrawlerConfig.class.getCanonicalName().equals(_config.getClass().getCanonicalName());
     }
 
     @Override
-    public void Crawling(Object _config) throws Exception {
+    public void Crawling(BaseCrawlerConfig _config) throws Exception {
         BrowserCrawlerConfig browserCrawlerConfig = (BrowserCrawlerConfig)_config;
         super.executeThread(()->{
             driverDispatchPool.ExecuteWithFreeInstance((freeItem) ->{
@@ -40,10 +44,10 @@ public class BrowserCrawler extends ICrawlerfj {
                 return null;
             });
             return null;
-        });
+        },browserCrawlerConfig);
     }
 
-    private class BrowserInstance implements BrowserCrawlerConfig.Browser{
+    private class BrowserInstance extends BrowserCrawlerConfig.Browser{
         private WebDriver driver;
 
         protected BrowserInstance(WebDriver driver){
@@ -51,17 +55,17 @@ public class BrowserCrawler extends ICrawlerfj {
         }
 
         @Override
-        public void toPage(String url) {
+        protected void _toPage(String url) {
             driver.get(url);
         }
 
         @Override
-        public String getPageContent() {
+        public String _getPageContent() {
             return driver.getPageSource();
         }
 
         @Override
-        public void executeScript(String script) {
+        public void _executeScript(String script) {
             ((ChromeDriver)driver).executeScript(script);
         }
     }
