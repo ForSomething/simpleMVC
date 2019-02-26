@@ -1,5 +1,7 @@
 package common.pool;
 
+import com.sun.jna.platform.win32.COM.TypeLibUtil;
+
 import java.util.ArrayList;
 
 public abstract class DispatchPool<T> {
@@ -17,9 +19,16 @@ public abstract class DispatchPool<T> {
     }
 
     public Object ExecuteWithFreeInstance(TheTask<T> task) throws Exception{
-        T freeInstance = GetFreeInstance();
-        Object result = task.Execute(freeInstance);
-        GiveBackFreeInstance(freeInstance);
+        Object result = null;
+        T freeInstance = null;
+        try{
+            freeInstance = GetFreeInstance();
+            result = task.Execute(freeInstance);
+        } finally {
+            if(freeInstance != null){
+                GiveBackFreeInstance(freeInstance);
+            }
+        }
         return result;
     }
 

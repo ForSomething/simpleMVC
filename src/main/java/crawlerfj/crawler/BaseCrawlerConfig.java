@@ -1,6 +1,5 @@
 package crawlerfj.crawler;
 
-import common.eventhandlerinterface.BaseEventHandler;
 import toolroom.JsonUtils;
 
 import java.util.HashMap;
@@ -9,7 +8,7 @@ import java.util.Map;
 public class BaseCrawlerConfig {
     private Map<String,Object> dataStore = new HashMap<>();
 
-    private BaseEventHandler exceptionHandler;
+    private CrawlerExeceptionHandler exceptionHandler;
 
     public <T> T getStoringData(String key) {
         return (T)dataStore.get(key);
@@ -19,11 +18,11 @@ public class BaseCrawlerConfig {
         this.dataStore.put(key,userParam);
     }
 
-    public BaseEventHandler getExceptionHandler() {
+    public CrawlerExeceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
 
-    public void setExceptionHandler(BaseEventHandler exceptionHandler) {
+    public void setExceptionHandler(CrawlerExeceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
     }
 
@@ -32,5 +31,10 @@ public class BaseCrawlerConfig {
         HashMap<String,Object> logMap = new HashMap<>();
         logMap.put("storingData",dataStore);
         return JsonUtils.parse2Json(logMap);
+    }
+
+    @FunctionalInterface
+    public interface CrawlerExeceptionHandler{
+        void execute(Exception exeception,BaseCrawlerConfig baseCrawlerConfig);
     }
 }

@@ -49,19 +49,20 @@ public abstract class ICrawlerfj {
 
         @Override
         public Object call() throws Exception {
-            Thread.currentThread().setUncaughtExceptionHandler((thread,throwable) -> {
-                try{
-                    new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,throwable.toString(),baseCrawlerConfig.toString()).insert();
-                    if(baseCrawlerConfig.getExceptionHandler() != null){
-                        baseCrawlerConfig.getExceptionHandler().Excute(baseCrawlerConfig);
-                    }
-                }catch (Exception e){
-                    // TODO 这里不懂要怎么处理
-                    e.printStackTrace();
+            Object result = null;
+            boolean success = false;
+            try{
+                result = callable.call();
+                success = true;
+            }catch (Exception e){
+                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,e.toString(),baseCrawlerConfig.toString()).insert();
+                if(baseCrawlerConfig.getExceptionHandler() != null){
+                    baseCrawlerConfig.getExceptionHandler().execute(e,baseCrawlerConfig);
                 }
-            });
-            Object result = callable.call();
-            new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成",baseCrawlerConfig.toString()).insert();
+            }
+            if(success){
+                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成",baseCrawlerConfig.toString()).insert();
+            }
             return result;
         }
     }

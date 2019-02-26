@@ -1,6 +1,7 @@
 package action;
 
 import crawlerfj.crawlercase.dataentity.Chapter;
+import crawlerfj.crawlercase.dataentity.CrawlerLog;
 import crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
 import toolroom.FileUtils;
 import toolroom.JsonUtils;

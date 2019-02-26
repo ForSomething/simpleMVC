@@ -3,6 +3,7 @@ package crawlerfj.crawlercase.dataentity;
 import annotation.Table;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Table(table = "crawler_log")
 public class CrawlerLog extends BaseDataEntity {
@@ -22,6 +23,10 @@ public class CrawlerLog extends BaseDataEntity {
         this.logType = logType;
         this.message = message;
         this.remark = remark;
+    }
+
+    public static List<CrawlerLog> load(Object cond) throws Exception {
+        return select(cond,CrawlerLog.class);
     }
 
     private Timestamp createTime;

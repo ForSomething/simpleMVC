@@ -84,7 +84,7 @@ public class BaseDataEntity {
                 tableName = tableAnnotation.table();
             }
             //排序列
-            sortColumns = tableAnnotation.sortColumns();
+            sortColumns = tableAnnotation.sortColumns() == null ? "" : tableAnnotation.sortColumns().trim();
         }
         StringBuilder sqlBilder = new StringBuilder("select * from ").append(tableName);
         if(cond != null){
@@ -119,7 +119,9 @@ public class BaseDataEntity {
                     condIndex++;
                 }
             }
-            sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
+            if(!StringUtils.IsNullOrWihtespace(sortColumns)){
+                sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
+            }
         }
         List<Map<String,Object>> resultList = MysqlUtils.ExecuteQuerySql(sqlBilder.toString(),parameters);
         List<T> resultBeanList = new LinkedList<>();

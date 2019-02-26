@@ -30,13 +30,7 @@ public class SingleStepCrawler extends ICrawlerfj {
     public void Crawling(BaseCrawlerConfig _config) {
         SingleStepConfig config = (SingleStepConfig)_config;
         super.executeThread(()->{
-            if(config.getBeforeCrawlingHandler() != null){
-                config.getBeforeCrawlingHandler().Excute(config);
-            }
             config.getSingleStep().Execute(doRequest(config.getRequestEntity()),config);
-            if(config.getAfterCrawlingHandler() != null){
-                config.getAfterCrawlingHandler().Excute(config);
-            }
             return null;
         },config);
     }
