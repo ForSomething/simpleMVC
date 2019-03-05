@@ -1,5 +1,8 @@
 package toolroom.dbutil;
 
+import annotation.EventListen;
+import common.constvaslue.Events;
+
 import java.sql.*;
 import java.util.*;
 
@@ -9,6 +12,8 @@ public class MysqlUtils {
 
     static final String USER = "root";
     static final String PASS = "123456";
+
+    private static ThreadLocal<Connection> localConnection = new ThreadLocal<>();
 
 
     static {
@@ -80,13 +85,19 @@ public class MysqlUtils {
         return resultList;
     }
 
-    public static void test() throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL,USER,PASS);
-        connection.setAutoCommit(false);
-        PreparedStatement preparedStatement = connection.prepareStatement("insert into testtable (numCol) values (0)");
-        preparedStatement.execute();
-        connection.commit();
-        preparedStatement.execute("insert into testtable (numCol) values (2)");
-        connection.commit();
+    @EventListen(event= {Events.ON_THREAD_COMPLETA,Events.ON_THREAD_ERROR})
+    private static void rollBackTransactions(Events event){
+        try{
+            Connection conn = localConnection.get();
+            if(conn == null){
+                return;
+            }
+            switch (event){
+                case ON_THREAD_COMPLETA:conn.commit();break;
+                case ON_THREAD_ERROR:conn.rollback();break;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
