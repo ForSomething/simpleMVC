@@ -101,7 +101,7 @@
             <target>1.8</target>
             <encoding>UTF-8</encoding>
             <annotationProcessors>
-              <annotationProcessor>annotation.AnnotationHandler</annotationProcessor>
+              <annotationProcessor>compilePlugins.annotationPlugins.AnnotationHandler</annotationProcessor>
             </annotationProcessors>
           </configuration>
         </plugin>

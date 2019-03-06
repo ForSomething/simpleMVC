@@ -2,7 +2,7 @@ package action;
 
 import crawlerfj.crawlercase.dataentity.Chapter;
 import crawlerfj.crawlercase.dataentity.CrawlerLog;
-import crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
+//import crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
 import toolroom.FileUtils;
 import toolroom.JsonUtils;
 import toolroom.StringUtils;
@@ -45,7 +45,7 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            HuhumhConfig.ExecuteByConfig();
+//            HuhumhConfig.ExecuteByConfig();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
         } catch (Exception e){
             errStr = e.getMessage();
