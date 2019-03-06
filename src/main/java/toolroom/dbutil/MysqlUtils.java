@@ -2,6 +2,7 @@ package toolroom.dbutil;
 
 import annotation.EventListen;
 import common.constvaslue.Events;
+import toolroom.FileUtils;
 
 import java.sql.*;
 import java.util.*;
@@ -88,15 +89,16 @@ public class MysqlUtils {
     @EventListen(event= {Events.ON_THREAD_COMPLETA,Events.ON_THREAD_ERROR})
     private static void rollBackTransactions(Events event){
         try{
-            Connection conn = localConnection.get();
-            if(conn == null){
-                return;
-            }
-            switch (event){
-                case ON_THREAD_COMPLETA:conn.commit();break;
-                case ON_THREAD_ERROR:conn.rollback();break;
-            }
-        } catch (SQLException e) {
+//            Connection conn = localConnection.get();
+//            if(conn == null){
+//                return;
+//            }
+//            switch (event){
+//                case ON_THREAD_COMPLETA:conn.commit();break;
+//                case ON_THREAD_ERROR:conn.rollback();break;
+//            }
+            FileUtils.WriteLine(event.toString(),"C:\\Users\\Administrator\\Desktop\\testlog.txt",true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

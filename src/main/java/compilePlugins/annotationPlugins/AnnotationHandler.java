@@ -1,16 +1,10 @@
 package compilePlugins.annotationPlugins;
 
-import toolroom.FileUtils;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +16,7 @@ public class AnnotationHandler extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
             Set<? extends Element> classSet = roundEnv.getRootElements();
+            String packageName = AnnotationHandler.class.getCanonicalName().replace(AnnotationHandler.class.getSimpleName(),"");
             for(Element classItem : classSet){
                 List<? extends Element> enclosedElems = classItem.getEnclosedElements();
                 for(Element fieldAndMethod : enclosedElems){
@@ -30,13 +25,13 @@ public class AnnotationHandler extends AbstractProcessor {
                     for(AnnotationMirror annotation : annotationMirrors){
                         Class handleClass = null;
                         try {
-                            handleClass = Class.forName("compilePlugins.annotationPlugins." +
+                            handleClass = Class.forName(packageName +
                                     annotation.getAnnotationType().asElement().getSimpleName() + "Handler");
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
                         if(handleClass != null){
-                            ((AnnotationHandler.AnnotationItemHandler)handleClass.newInstance()).execute(fieldAndMethod,annotation);
+                            ((AnnotationHandler.AnnotationItemHandler)handleClass.newInstance()).execute(fieldAndMethod,annotation,processingEnv);
                         }
                     }
                 }
@@ -48,6 +43,6 @@ public class AnnotationHandler extends AbstractProcessor {
     }
 
     interface AnnotationItemHandler{
-        void execute(Element element,AnnotationMirror annotation);
+        void execute(Element element,AnnotationMirror annotation, ProcessingEnvironment environment);
     }
 }
