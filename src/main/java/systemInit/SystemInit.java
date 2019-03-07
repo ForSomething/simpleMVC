@@ -3,14 +3,16 @@ package systemInit;
 import common.constvaslue.Events;
 import eventManegement.EventManeger;
 import toolroom.FileUtils;
+import toolroom.JsonUtils;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class SystemInit implements ServletContextListener {
     @Override
@@ -23,19 +25,18 @@ public class SystemInit implements ServletContextListener {
                 if((line = reader.readLine()) == null){
                     break;
                 }
-                String[] eventParam = line.split(":");
-                String[] methodParam = eventParam[1].split("->");
-                String[] methodParamArray = methodParam[1].substring(methodParam[1].indexOf('(') + 1,methodParam[1].indexOf(')')).split(",");
-                Class[] methodParamClassesArray = new Class[methodParamArray.length];
-                for(int index = 0;index < methodParamArray.length;index++){
-                    methodParamClassesArray[index] = Class.forName(methodParamArray[index]);
+                String[] eventParam = line.split("->");
+                Map<String,Object> mathodInfoMap = JsonUtils.parseJsonString2Map(eventParam[1]);
+                List<String> paramterList = (List<String>)mathodInfoMap.get("paramter");
+                Class[] methodParamClassesArray = new Class[paramterList.size()];
+                for(int index = 0;index < paramterList.size();index++){
+                    methodParamClassesArray[index] = Class.forName(Events.class.getCanonicalName());
                 }
                 Events events = Events.valueOf(eventParam[0].substring(eventParam[0].lastIndexOf('.') + 1));
-                Class theClassMethodBelongTo = Class.forName(methodParam[0]);
+                Class theClassMethodBelongTo = Class.forName(mathodInfoMap.get("class").toString());
                 EventManeger.registerListener(events,
-                        theClassMethodBelongTo.getDeclaredMethod(methodParam[1].substring(0,methodParam[1].indexOf('(')),methodParamClassesArray));
+                        theClassMethodBelongTo.getDeclaredMethod(mathodInfoMap.get("method").toString(),methodParamClassesArray));
             }
-            EventManeger.on(Events.NOTHING);
         }catch (Exception e){
             e.printStackTrace();
         }
