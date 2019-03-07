@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class BaseDataEntity {
+    public void insertAndCommit(){
+
+    }
+
     public void insert() throws Exception{
         Class entityClass = this.getClass();
         String tableName;

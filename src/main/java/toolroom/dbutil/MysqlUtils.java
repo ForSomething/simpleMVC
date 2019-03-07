@@ -26,7 +26,7 @@ public class MysqlUtils {
     }
 
     public static void ExecuteBatchBySqlTemplate(String sqlTemplate,List<List<Object>> parametersList) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL,USER,PASS);
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sqlTemplate);
         try{
             for(List<Object> parameters : parametersList ){
@@ -38,7 +38,6 @@ public class MysqlUtils {
                 preparedStatement.execute();
             }
         }finally {
-            connection.close();
             preparedStatement.close();
         }
     }
@@ -50,7 +49,7 @@ public class MysqlUtils {
     }
 
     public static List<Map<String,Object>> ExecuteQuerySql(String sql,List<Object> parameters) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL,USER,PASS);
+        Connection connection = getConnection();
         ResultSet resultSet = null;
         List<Map<String,Object>> resultList = new LinkedList<>();
         List<String> columnLables = null;
@@ -79,25 +78,33 @@ public class MysqlUtils {
                 }
             }
         }finally {
-            connection.close();
 //            preparedStatement.close();
             resultSet.close();
         }
         return resultList;
     }
 
+    private static Connection getConnection() throws SQLException {
+        Connection conn = localConnection.get();
+        if(conn == null){
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            localConnection.set(conn);
+        }
+        return conn;
+    }
+
     @EventListen(event= {Events.ON_THREAD_COMPLETA,Events.ON_THREAD_ERROR})
     private static void rollBackTransactions(Events event){
+        Connection conn = localConnection.get();
         try{
-//            Connection conn = localConnection.get();
-//            if(conn == null){
-//                return;
-//            }
-//            switch (event){
-//                case ON_THREAD_COMPLETA:conn.commit();break;
-//                case ON_THREAD_ERROR:conn.rollback();break;
-//            }
-            FileUtils.WriteLine(event.toString(),"C:\\Users\\Administrator\\Desktop\\testlog.txt",true);
+            if(conn == null){
+                return;
+            }
+            switch (event){
+                case ON_THREAD_COMPLETA:conn.commit();break;
+                case ON_THREAD_ERROR:conn.rollback();break;
+            }
+            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
