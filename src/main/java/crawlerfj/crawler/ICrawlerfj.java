@@ -1,7 +1,9 @@
 package crawlerfj.crawler;
 
+import common.constvaslue.Events;
 import common.eventhandlerinterface.BaseEventHandler;
 import crawlerfj.crawlercase.dataentity.CrawlerLog;
+import eventManegement.EventManeger;
 import toolroom.httputil.HttpUtils;
 import toolroom.httputil.RequestEntity;
 import toolroom.httputil.ResponseEntity;
@@ -47,21 +49,21 @@ public abstract class ICrawlerfj {
             this.baseCrawlerConfig = baseCrawlerConfig;
         }
 
+        // TODO 这个地方日志和事件还有用户自动一异常处理器的执行，他们之间的顺序要考虑一下
         @Override
         public Object call() throws Exception {
             Object result = null;
-            boolean success = false;
             try{
                 result = callable.call();
-                success = true;
+                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成",baseCrawlerConfig.toString()).insert();
+                EventManeger.on(Events.ON_THREAD_COMPLETA);
             }catch (Exception e){
+                e.printStackTrace();
                 new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,e.toString(),baseCrawlerConfig.toString()).insert();
+                EventManeger.on(Events.ON_THREAD_ERROR);
                 if(baseCrawlerConfig.getExceptionHandler() != null){
                     baseCrawlerConfig.getExceptionHandler().execute(e,baseCrawlerConfig);
                 }
-            }
-            if(success){
-                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成",baseCrawlerConfig.toString()).insert();
             }
             return result;
         }

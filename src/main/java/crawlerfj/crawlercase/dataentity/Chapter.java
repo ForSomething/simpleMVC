@@ -3,6 +3,7 @@ package crawlerfj.crawlercase.dataentity;
 import annotation.Table;
 
 import java.util.List;
+import java.util.UUID;
 
 @Table(table = "chapter_tree", sortColumns = "indexNum")
 public class Chapter extends BaseDataEntity {
@@ -14,7 +15,7 @@ public class Chapter extends BaseDataEntity {
     Integer indexNum;
 
     public Chapter(String id,String parentID,String chapterName,String chapterContent,String remark,Integer indexNum){
-        this.id = id;
+        this.id = UUID.randomUUID().toString().replace("-","");
         this.parentID = parentID;
         this.chapterName = chapterName;
         this.chapterContent = chapterContent;

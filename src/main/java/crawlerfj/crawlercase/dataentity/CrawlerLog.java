@@ -11,18 +11,21 @@ public class CrawlerLog extends BaseDataEntity {
         NORMAL,
         ERROR,
         DEBUG,
-        WARMING
+        WARMING,
+        NOTE
     }
 
     public CrawlerLog(){
-
+        this.setAutoCommit(true);
     }
 
     public CrawlerLog(Timestamp createTime, LogType logType, String message, String remark){
+        this();
         this.createTime = createTime;
         this.logType = logType;
         this.message = message;
         this.remark = remark;
+        this.setAutoCommit(true);
     }
 
     public static List<CrawlerLog> load(Object cond) throws Exception {

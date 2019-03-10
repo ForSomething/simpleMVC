@@ -8,7 +8,7 @@ import java.util.Map;
 public class BaseCrawlerConfig {
     private Map<String,Object> dataStore = new HashMap<>();
 
-    private CrawlerExeceptionHandler exceptionHandler;
+    private CrawlerExceptionHandler exceptionHandler;
 
     public <T> T getStoringData(String key) {
         return (T)dataStore.get(key);
@@ -18,11 +18,11 @@ public class BaseCrawlerConfig {
         this.dataStore.put(key,userParam);
     }
 
-    public CrawlerExeceptionHandler getExceptionHandler() {
+    public CrawlerExceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
 
-    public void setExceptionHandler(CrawlerExeceptionHandler exceptionHandler) {
+    public void setExceptionHandler(CrawlerExceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
     }
 
@@ -34,7 +34,7 @@ public class BaseCrawlerConfig {
     }
 
     @FunctionalInterface
-    public interface CrawlerExeceptionHandler{
-        void execute(Exception exeception,BaseCrawlerConfig baseCrawlerConfig);
+    public interface CrawlerExceptionHandler {
+        void execute(Exception exception,BaseCrawlerConfig baseCrawlerConfig);
     }
 }

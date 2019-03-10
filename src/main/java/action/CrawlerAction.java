@@ -1,5 +1,6 @@
 package action;
 
+import crawlerfj.crawlercase.HuhumhConfig;
 import crawlerfj.crawlercase.dataentity.Chapter;
 import crawlerfj.crawlercase.dataentity.CrawlerLog;
 //import crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
@@ -45,9 +46,10 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-//            HuhumhConfig.ExecuteByConfig();
+            HuhumhConfig.executeDownload();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
         } catch (Exception e){
+            e.printStackTrace();
             errStr = e.getMessage();
         }
         if(!StringUtils.IsNullOrWihtespace(errStr)){

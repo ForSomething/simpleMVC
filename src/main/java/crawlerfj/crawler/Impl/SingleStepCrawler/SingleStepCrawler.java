@@ -36,6 +36,9 @@ public class SingleStepCrawler extends ICrawlerfj {
     }
 
     private ResponseEntity doRequest(RequestEntity requestEntity) throws Exception {
+        if(requestEntity.getRequestMethod() == null){
+            throw new Exception("requestMethod is null");
+        }
         switch (requestEntity.getRequestMethod()){
             case GET: return HttpUtils.doGet(requestEntity);
             case POST: return HttpUtils.doPost(requestEntity);

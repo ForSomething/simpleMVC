@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class BaseDataEntity {
-    public void insertAndCommit(){
+    private boolean autoCommit = false;
 
+    public BaseDataEntity setAutoCommit(boolean autoCommit){
+        this.autoCommit = autoCommit;
+        return this;
     }
 
     public void insert() throws Exception{
@@ -56,7 +59,7 @@ public class BaseDataEntity {
             fieldsBuilder.append(columnName);
             valuesBuilder.append("?");
         }
-        MysqlUtils.ExecuteBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters);
+        MysqlUtils.ExecuteBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters,autoCommit);
     }
 
     public void delete(){
