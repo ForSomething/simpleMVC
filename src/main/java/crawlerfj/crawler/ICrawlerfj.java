@@ -12,11 +12,8 @@ import java.util.concurrent.*;
 public abstract class ICrawlerfj {
     private static ThreadPoolExecutor threadPoolExecutor;
 
-    private static Map<String, Future> futureMap;
-
     static {
         threadPoolExecutor = new ThreadPoolExecutor(50,50,1, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
-        futureMap = new HashMap<>();
     }
 
     protected ICrawlerfj(){
@@ -28,10 +25,8 @@ public abstract class ICrawlerfj {
     abstract public void Crawling(BaseCrawlerConfig _config) throws Exception;
 
     protected void executeThread(Callable callable, BaseCrawlerConfig baseCrawlerConfig){
-//        String threadID = UUID.randomUUID().toString().replace("-","");
         CrawlerCallable crawlerCallable = new CrawlerCallable(callable,baseCrawlerConfig);
         threadPoolExecutor.submit(crawlerCallable);
-//        futureMap.put(threadID,threadPoolExecutor.submit(crawlerCallable));
     }
 
     private class CrawlerCallable implements Callable{
