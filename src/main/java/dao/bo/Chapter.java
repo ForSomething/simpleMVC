@@ -1,4 +1,4 @@
-package crawlerfj.crawlercase.dataentity;
+package dao.bo;
 
 import annotation.Table;
 

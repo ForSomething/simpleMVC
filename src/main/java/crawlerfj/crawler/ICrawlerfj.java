@@ -1,17 +1,12 @@
 package crawlerfj.crawler;
 
 import common.constvaslue.Events;
-import common.eventhandlerinterface.BaseEventHandler;
-import crawlerfj.crawlercase.dataentity.CrawlerLog;
+import dao.bo.CrawlerLog;
 import eventManegement.EventManeger;
-import toolroom.httputil.HttpUtils;
-import toolroom.httputil.RequestEntity;
-import toolroom.httputil.ResponseEntity;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.*;
 
 public abstract class ICrawlerfj {
