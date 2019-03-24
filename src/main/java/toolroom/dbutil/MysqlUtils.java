@@ -37,7 +37,7 @@ public class MysqlUtils {
         try{
             for(int index = 0; index < parameters.size();index++){
                 Object value = parameters.get(index);
-                preparedStatement.setObject(index + 1,value.toString());// TODO 这里要进行处理，不能一味的tostring
+                preparedStatement.setObject(index + 1,value == null ? null : value.toString());// TODO 这里要进行处理，不能一味的tostring
             }
             preparedStatement.execute();
         }finally {

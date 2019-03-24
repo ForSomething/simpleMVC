@@ -1,11 +1,11 @@
 package toolroom.httputil;
 
-import crawlerfj.common.Regex;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import toolroom.RegexUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,28 +13,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpUtils {
-    public static ResponseEntity doGet(RequestEntity requestEntity) throws IOException {
+    public static Response doGet(Request request) throws IOException {
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         CloseableHttpClient httpClient = clientBuilder.build();
-        HttpGet httpGet = new HttpGet(requestEntity.getRequestURL());
+        HttpGet httpGet = new HttpGet(request.getRequestURL());
         //加入自定义的请求头
         Map<String,String> requestHeaderMap;
-        if((requestHeaderMap = requestEntity.getRequestHeaderMap()) != null && requestHeaderMap.size() > 0){
+        if((requestHeaderMap = request.getRequestHeaderMap()) != null && requestHeaderMap.size() > 0){
             for(String key : requestHeaderMap.keySet()){
                 httpGet.setHeader(key,requestHeaderMap.get(key));
             }
         }
         HttpResponse response = httpClient.execute(httpGet);
-        ResponseEntity responseEntity = new ResponseEntity();
+        Response responseEntity = new Response();
         responseEntity.setStateCode(response.getStatusLine().getStatusCode());
-        responseEntity.setBaseUrl(requestEntity.getRequestURL());
+        responseEntity.setBaseUrl(request.getRequestURL());
         responseEntity.setContent(ReadInputStreamIntoByteArray(response.getEntity().getContent()));
         //先从http头中获取域名，如果获取不到，则用正则表达式从url中抠出域名
         Header[] headers = response.getHeaders("Host");
         if(headers != null && headers.length > 0){
             responseEntity.setDomain(headers[0].getValue());
         }else{
-            responseEntity.setDomain(Regex.getDomain(requestEntity.getRequestURL()));
+            responseEntity.setDomain(RegexUtils.getDomain(request.getRequestURL()));
         }
         //获取协议
         responseEntity.setProtocol(response.getProtocolVersion().getProtocol());
@@ -47,7 +47,7 @@ public class HttpUtils {
         return responseEntity;
     }
 
-    public static ResponseEntity doPost(RequestEntity requestEntity) throws IOException {
+    public static Response doPost(Request request) throws IOException {
         return null;
     }
 

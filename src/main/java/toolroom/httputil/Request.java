@@ -1,12 +1,10 @@
 package toolroom.httputil;
 
-import crawlerfj.common.Const;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestEntity {
+public class Request implements Cloneable {
     private String requestURL = null;
 
     private Map<String,String> requestHeaderMap = null;
@@ -15,7 +13,7 @@ public class RequestEntity {
 
     private Map<String,String> cookieMap = null;
 
-    private Const.requestMethod requestMethod = null;
+    private RequestMethod requestMethod = RequestMethod.GET;
 
     public String getRequestURL() {
         return requestURL;
@@ -33,7 +31,7 @@ public class RequestEntity {
         return requestParamMap;
     }
 
-    public Const.requestMethod getRequestMethod() {
+    public RequestMethod getRequestMethod() {
         return requestMethod;
     }
 
@@ -41,7 +39,7 @@ public class RequestEntity {
         this.requestURL = requestURL;
     }
 
-    public void setRequestMethod(Const.requestMethod requestMethod) {
+    public void setRequestMethod(RequestMethod requestMethod) {
         this.requestMethod = requestMethod;
     }
 
@@ -112,5 +110,15 @@ public class RequestEntity {
         if(cookieMap != null){
             cookieMap.clear();
         }
+    }
+
+    public enum RequestMethod{
+        GET,
+        POST
+    }
+
+    @Override
+    public Request clone() throws CloneNotSupportedException {
+        return (Request)super.clone();
     }
 }

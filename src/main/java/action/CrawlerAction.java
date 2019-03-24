@@ -1,6 +1,7 @@
 package action;
 
 import crawlerfj.crawlercase.HuhumhConfig;
+import crawlerfj.crawlercase.Mzitu;
 import dao.bo.Chapter;
 //import crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
 import toolroom.FileUtils;
@@ -45,7 +46,7 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-            HuhumhConfig.executeDownload();
+            Mzitu.executeByConfig();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
         } catch (Exception e){
             e.printStackTrace();

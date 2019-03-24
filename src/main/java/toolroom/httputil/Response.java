@@ -2,7 +2,7 @@ package toolroom.httputil;
 
 import java.util.Map;
 
-public class ResponseEntity {
+public class Response {
     private int stateCode;
 
     private String baseUrl;
