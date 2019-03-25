@@ -112,9 +112,6 @@ public class MysqlUtils {
                 conn.setClientInfo("connectionID",String.valueOf(connectionSerialNumber));
             }
             conn.setClientInfo("commitType",autoCommit ? "autoCommit" : "cmdCommit");
-            System.out.println("one connection has been got,id is " + conn.getClientInfo("connectionID") +
-                    " and it's " + conn.getClientInfo("commitType") +
-                    " ,current connection count is " + connectionCount);
         }
     }
 
@@ -122,8 +119,6 @@ public class MysqlUtils {
         connection.close();
         connectionCount--;
 
-        System.out.println("current connection count lose 1 ," + "this one id is " + connection.getClientInfo("connectionID") +
-                " and it's " + connection.getClientInfo("commitType") + " now is " + connectionCount);
 //        MysqlUtils.class.notify();
     }
 

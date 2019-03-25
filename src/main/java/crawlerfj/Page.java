@@ -75,11 +75,11 @@ public class Page implements Cloneable {
             try{
                 page.setResponse(page.$environmentCore.request(page.getRequest()));
                 callback.execute(page);
-                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成", page.toString()).insert();
+//                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成", page.toString()).insert();
                 EventManeger.on(Events.ON_THREAD_COMPLETA);
             }catch (Exception e){
                 e.printStackTrace();
-                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,e.toString(), page.toString()).insert();
+//                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,e.toString(), page.toString()).insert();
                 EventManeger.on(Events.ON_THREAD_ERROR);
                 if(exceptionHandler != null){
                     exceptionHandler.execute(e, page,callback);
@@ -129,7 +129,7 @@ public class Page implements Cloneable {
         HashMap<String,Object> logMap = new HashMap<>();
         logMap.put("storingData",dataStore);
         logMap.put("request",request);
-        logMap.put("response",$response);
+        logMap.put("responseCode",$response == null ? "未获取到response" : $response.getStateCode());
         return JsonUtils.parse2Json(logMap);
     }
 }

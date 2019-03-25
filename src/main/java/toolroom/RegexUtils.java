@@ -25,4 +25,10 @@ public class RegexUtils {
         }
         return url.substring(0,protocolEndIndex);
     }
+
+    private static String illegalCharInFileNameRegex = "[\\\\/:*?\"<>|]";
+
+    public static String fileNameFilter(String fileName){
+        return Pattern.compile(illegalCharInFileNameRegex).matcher(fileName).replaceAll("");
+    }
 }
