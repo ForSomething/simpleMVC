@@ -1,13 +1,24 @@
 package event;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class EventManeger {
     private static HashMap<Events, LinkedList<Method>> eventListenerMap = new HashMap<>();
+
+    private static ThreadPoolExecutor threadPoolExecutor;
+
+    static {
+        threadPoolExecutor = new ThreadPoolExecutor(50,50,1, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+    }
 
     private EventManeger(){}
 
@@ -27,11 +38,14 @@ public class EventManeger {
             for(Class parameterType : parameterTypes){
                 invokeParameters.add(event);
             }
-            try{
-                method.invoke(null,invokeParameters.toArray());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            threadPoolExecutor.submit(()->{
+                try {
+                    method.invoke(null,invokeParameters.toArray());
+                } catch (Exception e) {
+                    // todo 这里要写日志
+                    e.printStackTrace();
+                }
+            });
         }
     }
 

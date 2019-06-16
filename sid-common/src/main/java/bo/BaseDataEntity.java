@@ -21,7 +21,7 @@ public class BaseDataEntity {
     public void insert() throws Exception{
         Class entityClass = this.getClass();
         String tableName;
-        if(!entityClass.isAnnotationPresent(Table.class) || StringUtils.IsNullOrWihtespace((tableName = ((Table)entityClass.getAnnotation(Table.class)).table()))){
+        if(!entityClass.isAnnotationPresent(Table.class) || StringUtils.isNullOrWihtespace((tableName = ((Table)entityClass.getAnnotation(Table.class)).table()))){
             //如果类未被Table注解标注，或者注解的table值是空字符串，则用类名作为表名,否则用table值作为表名
             tableName = entityClass.getSimpleName();
         }
@@ -35,7 +35,7 @@ public class BaseDataEntity {
         for(int index = 0; index < fields.length;index++){
             Field field = fields[index];
             field.setAccessible(true);
-            if(!field.isAnnotationPresent(Table.class) || StringUtils.IsNullOrWihtespace((columnName = field.getAnnotation(Table.class).column()))){
+            if(!field.isAnnotationPresent(Table.class) || StringUtils.isNullOrWihtespace((columnName = field.getAnnotation(Table.class).column()))){
                 //如果变量未被Table注解标注，或者注解的column值是空字符串，则用变量名作为列名,否则用column值作为列名
                 columnName = field.getName();
             }
@@ -86,7 +86,7 @@ public class BaseDataEntity {
         if(entityClass.isAnnotationPresent(Table.class)){
             //如果类被Table注解标注
             Table tableAnnotation = entityClass.getAnnotation(Table.class);
-            if(!StringUtils.IsNullOrWihtespace(tableAnnotation.table())){
+            if(!StringUtils.isNullOrWihtespace(tableAnnotation.table())){
                 //注解指明了表名，则用注解中的表名
                 tableName = tableAnnotation.table();
             }
@@ -110,7 +110,7 @@ public class BaseDataEntity {
             for(Field field : fields){
                 field.setAccessible(true);
                 fieldName = field.getName();
-                if(!field.isAnnotationPresent(Table.class) || StringUtils.IsNullOrWihtespace((columnName = field.getAnnotation(Table.class).column()))){
+                if(!field.isAnnotationPresent(Table.class) || StringUtils.isNullOrWihtespace((columnName = field.getAnnotation(Table.class).column()))){
                     //如果变量未被Table注解标注，或者注解的column值是空字符串，则用变量名作为列名,否则用column值作为列名
                     columnName = field.getName();
                 }
@@ -126,7 +126,7 @@ public class BaseDataEntity {
                     condIndex++;
                 }
             }
-            if(!StringUtils.IsNullOrWihtespace(sortColumns)){
+            if(!StringUtils.isNullOrWihtespace(sortColumns)){
                 sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
             }
         }

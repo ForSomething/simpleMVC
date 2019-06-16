@@ -6,14 +6,14 @@ import java.util.Map;
 
 public class JsonUtils {
     public static Map<String,Object> parseJsonString2Map(String srcString){
-        if(StringUtils.IsNullOrWihtespace(srcString)){
+        if(StringUtils.isNullOrWihtespace(srcString)){
             return null;
         }
         return new Gson().fromJson(srcString,Map.class);
     }
 
     public static boolean tryParseJsonString2Map(String srcString,Map<String,Object> disMap){
-        if(StringUtils.IsNullOrWihtespace(srcString) || disMap == null){
+        if(StringUtils.isNullOrWihtespace(srcString) || disMap == null){
             return false;
         }
         try{

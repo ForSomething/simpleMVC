@@ -46,7 +46,7 @@ class SyntaxTree{
     static {
         rulesSyntaxTree = new SyntaxTree();
         rulesSyntaxTree.root = new TreeNode();
-        rulesSyntaxTree.root.value = '#';
+        rulesSyntaxTree.root.value = null;
         rulesSyntaxTree.root.children = new LinkedList<>();
         rulesSyntaxTree.root.children.add(null);
     }
@@ -85,7 +85,7 @@ class SyntaxTree{
 }
 
 class TreeNode{
-    char value;
+    Character value;
     List<TreeNode> children;
 
     public boolean hasChildren(){

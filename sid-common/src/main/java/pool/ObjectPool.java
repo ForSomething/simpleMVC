@@ -1,7 +1,6 @@
 package pool;
 
 
-import java.util.ArrayList;
 
 public abstract class ObjectPool<T> {
     private int currentItemCount;
@@ -41,6 +40,7 @@ public abstract class ObjectPool<T> {
             returnInstance(newInstance());
         }
         try{
+            // todo 这个地方是有对象被归还了才会notify的，所以应该不会存在唤醒之后currentObjectHolder还是null的情况，可以找个机会试试不用while如何
             while (currentObjectHolder == null){
                 this.wait();
             }

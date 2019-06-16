@@ -78,7 +78,7 @@ public class Page implements Cloneable {
                     exceptionHandler.execute(e, page,callback);
                 }
             }finally {
-                page.$environmentCore.free();
+                //page.$environmentCore.free(); // todo 这个free好像没有道理，难道异步获取之后就不能再使用这个环境了么
             }
             return result;
         });

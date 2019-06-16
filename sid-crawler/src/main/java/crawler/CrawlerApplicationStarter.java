@@ -1,7 +1,10 @@
 package crawler;
 
+import crawler.crawlerfj.environment.IEnvironmentCore;
+import crawler.crawlerfj.environment.impl.BrowserEnvironment;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -15,5 +18,10 @@ public class CrawlerApplicationStarter {
 //    @ResponseBody
 //    public String index(){
 //        return "";
+//    }
+
+//    @Bean
+//    public IEnvironmentCore stringBean(){
+//        return new BrowserEnvironment();
 //    }
 }

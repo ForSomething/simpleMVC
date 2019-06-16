@@ -1,7 +1,9 @@
 package crawler.action;
 
+import crawler.crawlerfj.crawlercase.Mzitu;
 import crawler.dao.bo.Chapter;
 //import crawler1.crawlerfj.crawlercase.huhumanhua.HuhumhConfig;
+import org.springframework.web.bind.annotation.PathVariable;
 import utils.FileUtils;
 import utils.JsonUtils;
 import utils.StringUtils;
@@ -45,14 +47,14 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-//            Mzitu.executeByConfig();
+            Mzitu.executeByConfig();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
             String sdfsdf = "";
         } catch (Exception e){
             e.printStackTrace();
-            errStr = e.getMessage();
+            errStr = e.toString();
         }
-        if(!StringUtils.IsNullOrWihtespace(errStr)){
+        if(!StringUtils.isNullOrWihtespace(errStr)){
             return errStr;
         }
         return "start crawling!";
@@ -96,5 +98,12 @@ public class CrawlerAction {
             e.printStackTrace();
             return e.getMessage();
         }
+    }
+
+    @RequestMapping(path = {"/{name}/*","/{name}"})
+    @ResponseBody
+    public String commonHandler(@PathVariable("name") String var){
+        //这个方法只是个例子，介绍@PathVariable这个注解的用法，在访问的url与上面的都不匹配时，会进这个方法
+        return "the name is " + var;
     }
 }

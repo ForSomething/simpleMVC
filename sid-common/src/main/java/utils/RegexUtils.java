@@ -16,7 +16,7 @@ public class RegexUtils {
     }
 
     public static String getProtocol(String url){
-        if(StringUtils.IsNullOrWihtespace(url)){
+        if(StringUtils.isNullOrWihtespace(url)){
             return null;
         }
         int protocolEndIndex = url.indexOf("://");
