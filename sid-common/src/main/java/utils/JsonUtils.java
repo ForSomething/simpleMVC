@@ -17,14 +17,13 @@ public class JsonUtils {
             return false;
         }
         try{
-            Map<String,Object> tempMap = new Gson().fromJson(srcString,Map.class);
+            Map<String,Object> tempMap = parseJsonString2Map(srcString);
             for(String key : tempMap.keySet()){
                 disMap.put(key,tempMap.get(key));
             }
         }catch (Exception e){
             return false;
         }
-
         return true;
     }
 
