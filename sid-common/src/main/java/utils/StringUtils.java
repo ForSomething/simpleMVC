@@ -19,11 +19,11 @@ public class StringUtils {
     }
 
     static public boolean isNullOrEmpty(String str){
-        return str == null || str.equals("");
+        return str == null || str.equals(emptyString);
     }
 
     static public boolean isNullOrWihtespace(String str){
-        return str == null || str.trim().equals("");
+        return str == null || str.trim().equals(emptyString);
     }
 
     static public <T> T getValueByTemplate(String srcString,String templateString,Class disObjectClass) throws Exception {
