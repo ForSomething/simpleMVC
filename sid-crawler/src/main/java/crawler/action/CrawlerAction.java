@@ -1,5 +1,6 @@
 package crawler.action;
 
+import crawler.crawlers.JuejinCrawler;
 import crawler.dao.bo.Chapter;
 import org.springframework.web.bind.annotation.PathVariable;
 import utils.FileUtils;
@@ -11,10 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/crawler")
@@ -45,7 +43,6 @@ public class CrawlerAction {
 //                value = value.replaceAll("\\)$",""); //去掉字符串尾的右括号
 //                return value;
 //            });
-//            Mzitu.executeByConfig();
 //            Chapter.load("396590a910d04771b1a29e49a8591c25");
             String sdfsdf = "";
         } catch (Exception e){
@@ -55,7 +52,7 @@ public class CrawlerAction {
         if(!StringUtils.isNullOrWihtespace(errStr)){
             return errStr;
         }
-        return "start crawling!";
+        return "management crawling!";
     }
 
     @RequestMapping(path = "/getChapter")
@@ -86,11 +83,11 @@ public class CrawlerAction {
     public String getChapterContent(HttpServletRequest request){
         try {
             String currentPath = request.getParameterMap().keySet().iterator().next();
-            String[] lines = FileUtils.ReadLinesFromFile(currentPath);
+//            String[] lines = FileUtils.ReadLinesFromFile(currentPath);
             StringBuilder returnStringBuilder = new StringBuilder();
-            for(String line : lines){
-                returnStringBuilder.append(String.format("<tr><td><img src=\"%s\"></td></tr>",line));
-            }
+//            for(String line : lines){
+//                returnStringBuilder.append(String.format("<tr><td><img src=\"%s\"></td></tr>",line));
+//            }
             return returnStringBuilder.toString();
         } catch (Exception e) {
             e.printStackTrace();

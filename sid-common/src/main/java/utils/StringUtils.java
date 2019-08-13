@@ -1,6 +1,7 @@
 package utils;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +25,14 @@ public class StringUtils {
 
     static public boolean isNullOrWihtespace(String str){
         return str == null || str.trim().equals(emptyString);
+    }
+
+    public static String toString(Object o){
+        return o != null ? o.toString().trim() : emptyString;
+    }
+
+    static public String getRandomString(int length){
+        return RandomStringUtils.randomAlphanumeric(length);
     }
 
     static public <T> T getValueByTemplate(String srcString,String templateString,Class disObjectClass) throws Exception {

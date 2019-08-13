@@ -3,8 +3,8 @@ package crawler.crawlerfj.environment;
 import crawler.crawlerfj.EnvironmentType;
 import crawler.crawlerfj.environment.impl.BrowserEnvironment;
 import crawler.crawlerfj.environment.impl.NormalEnvironment;
-import utils.httputil.Request;
-import utils.httputil.Response;
+import utils.communication.network.http.Request;
+import utils.communication.network.http.Response;
 
 public interface IEnvironmentCore {
     static IEnvironmentCore getInstance(EnvironmentType environmentType){

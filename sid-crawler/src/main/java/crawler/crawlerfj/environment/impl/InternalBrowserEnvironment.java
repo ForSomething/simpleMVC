@@ -1,18 +1,17 @@
 package crawler.crawlerfj.environment.impl;
 
 import crawler.crawlerfj.environment.IEnvironmentCore;
-import utils.communication.network.http.HttpUtils;
 import utils.communication.network.http.Request;
 import utils.communication.network.http.Response;
 
-public class NormalEnvironment implements IEnvironmentCore {
+public class InternalBrowserEnvironment implements IEnvironmentCore {
     @Override
     public Response request(Request request) throws Exception {
-        return HttpUtils.doRequest(request);
+        return null;
     }
 
     @Override
-    public Response executeScript(String script) {
+    public Response executeScript(String script) throws Exception {
         return null;
     }
 

@@ -6,8 +6,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import pool.ObjectPool;
 import utils.RegexUtils;
-import utils.httputil.Request;
-import utils.httputil.Response;
+import utils.communication.network.http.Request;
+import utils.communication.network.http.Response;
 
 import java.util.HashMap;
 
@@ -52,7 +52,7 @@ public class BrowserEnvironment implements IEnvironmentCore {
         response.setProtocol(RegexUtils.getProtocol(webDriver.getCurrentUrl()));
         response.setDomain(RegexUtils.getDomain(webDriver.getCurrentUrl()));
         response.setBaseUrl(webDriver.getCurrentUrl());
-        response.setResponseHeaderMap(new HashMap<>());
+        response.setHeaderMap(new HashMap<>());
         response.setContent(webDriver.getPageSource().getBytes("UTF-8"));
         return response;
     }

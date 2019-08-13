@@ -4,8 +4,8 @@ import crawler.crawlerfj.environment.IEnvironmentCore;
 import crawler.crawlerfj.function.Callback;
 import crawler.crawlerfj.function.ExceptionHandler;
 import utils.JsonUtils;
-import utils.httputil.Request;
-import utils.httputil.Response;
+import utils.communication.network.http.Request;
+import utils.communication.network.http.Response;
 
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,6 +44,9 @@ public class Page implements Cloneable {
     }
 
     public Page fetchResponseSync() throws Exception {
+        if(this.$environmentCore == null){
+            this.$environmentCore = IEnvironmentCore.getInstance(this.environmentType);
+        }
         this.setResponse(this.$environmentCore.request(this.getRequest()));
         return this;
     }
@@ -57,7 +60,7 @@ public class Page implements Cloneable {
         try {
             page = this.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            //implements了Cloneable，这个异常应该是不会发生了的
             return;
         }
         threadPoolExecutor.submit(()->{
@@ -68,12 +71,8 @@ public class Page implements Cloneable {
             try{
                 page.setResponse(page.$environmentCore.request(page.getRequest()));
                 callback.execute(page);
-//                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.NORMAL,"爬取完成", page.toString()).insert();
-//                EventManeger.on(Events.ON_THREAD_COMPLETA);
             }catch (Exception e){
                 e.printStackTrace();
-//                new CrawlerLog(new Timestamp(System.currentTimeMillis()), CrawlerLog.LogType.ERROR,e.toString(), page.toString()).insert();
-//                EventManeger.on(Events.ON_THREAD_ERROR);
                 if(exceptionHandler != null){
                     exceptionHandler.execute(e, page,callback);
                 }

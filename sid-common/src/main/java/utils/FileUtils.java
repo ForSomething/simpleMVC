@@ -1,36 +1,49 @@
 package utils;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 
 public class FileUtils {
-    public static void WriteLines(String[] lines, String fileName,boolean append) throws IOException {
-        fileName = fileName.replace("/","\\");
-        CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
+    public static void writeLine(String line, String fileName,boolean append) throws IOException {
+        String[] lines = {line};
+        writeLines(lines,fileName,append);
+    }
+
+    public static void writeLines(String[] lines, String fileName,boolean append) throws IOException {
+        fileName = fileName.replaceAll("[/\\\\]",Matcher.quoteReplacement(File.separator));
+        createFolderIfNotExists(fileName);
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName,append));
-        for(String text : lines){
-            bufferedWriter.write(text);
-            bufferedWriter.newLine();
+        try{
+            for(String text : lines){
+                bufferedWriter.write(text);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.flush();
+        }finally {
+            bufferedWriter.close();
         }
-        bufferedWriter.flush();
-        bufferedWriter.close();
     }
 
-    public static void WriteLine(String line, String fileName,boolean append) throws IOException {
-        WriteLines(new String[]{line},fileName,append);
+    public static void write(String text, String fileName, boolean append) throws IOException {
+        write(text == null ? null : text.getBytes(),fileName,append);
     }
 
-    public static void WriteBinaryData(byte[] data, String fileName, boolean append) throws IOException {
-        fileName = fileName.replace("/","\\");
-        CreateFolderIfNotExists(fileName.substring(0,fileName.lastIndexOf('\\')));
+    public static void write(byte[] data, String fileName, boolean append) throws IOException {
+        fileName = fileName.replaceAll("[/\\\\]",Matcher.quoteReplacement(File.separator));
+        createFolderIfNotExists(fileName);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fileName,append));
-        bos.write(data);
-        bos.flush();
-        bos.close();
+        try{
+            bos.write(data);
+            bos.flush();
+        }finally {
+            bos.close();
+        }
     }
 
-    public static String[] ReadLinesFromFile(String fileName) throws IOException {
-        fileName = fileName.replace("/","\\");
+    public static String[] readLines(String fileName) throws IOException {
+        fileName = fileName.replaceAll("[/\\\\]",Matcher.quoteReplacement(File.separator));
         File file = new File(fileName);
         if(!file.exists()){
             return null;
@@ -41,11 +54,16 @@ public class FileUtils {
         while ((line = bufferedReader.readLine()) != null){
             lines.add(line);
         }
-        return lines.toArray(new String[1]);
+        return lines.toArray(new String[0]);
     }
 
-    private static void CreateFolderIfNotExists(String folderName){
-        File file = new File(folderName);
+    private static void createFolderIfNotExists(String filePath){
+        int lastsfsdf = filePath.lastIndexOf(File.separator);
+        if(lastsfsdf <= 0){
+            return;
+        }
+        filePath = filePath.substring(0,lastsfsdf);
+        File file = new File(filePath);
         if(!file.exists()) {
             file.mkdirs();
         }
