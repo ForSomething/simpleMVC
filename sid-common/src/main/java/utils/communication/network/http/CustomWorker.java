@@ -25,22 +25,33 @@ import utils.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class HttpUtils {
-    public static Response doRequest(Request request) throws Exception {
-        Response response = null;
-        switch (request.getRequestMethod()){
-            case GET: response = doGet(request);break;
-            case POST: response = doPost(request);break;
+public class CustomWorker extends BaseHttpWorker{
+    @Override
+    public void request(Request r)throws IOException {
+        try{
+            switch (r.getRequestMethod()){
+                case GET: doGet(r);break;
+                case POST: doPost(r);break;
+            }
+        }catch (IOException e){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
-        return response;
     }
 
-    private static Response doGet(Request request) throws Exception {
+    @Override
+    public Response getResponse() {
+        return null;
+    }
+
+    private static Response doGet(Request request) throws IOException, URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(request.getRequestURL());
         uriBuilder.setCharset(Charset.forName(request.getCharSet()));
         //加入请求参数
@@ -156,8 +167,8 @@ public class HttpUtils {
                 destResponse.setDomain(header.getValue());
             }else if("Content-Type".equals(header.getName())){
                 //获取字符集
-                String temp = RegexUtils.getFirstSubstring(header.getValue().toLowerCase(),"charset=\\s*\\w+");
-                destResponse.setCharSet(StringUtils.isNullOrWihtespace(temp) ? temp : temp.substring(7).trim());
+                String temp = RegexUtils.getFirstSubstring(header.getValue().toLowerCase(),"charset=\\s*[\\w-]+");
+                destResponse.setCharSet(StringUtils.isNullOrWihtespace(temp) ? temp : temp.substring(8).trim());
             }
         }
         if(destResponse.getDomain() == null){

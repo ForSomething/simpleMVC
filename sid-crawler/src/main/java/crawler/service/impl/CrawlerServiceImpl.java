@@ -34,7 +34,7 @@ public class CrawlerServiceImpl implements CrawlerService {
     }
 
     public String getSearchListInfo(String searchPath) throws IOException {
-//        HttpResponse response = toolroom.HttpUtils.doGet(searchPath);
+//        HttpResponse response = toolroom.CustomWorker.doGet(searchPath);
 //        if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //            HttpEntity entity = response.getEntity();
 //            if(entity != null){
@@ -60,7 +60,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 //        FileOutputStream fileOutputStream = new FileOutputStream(file,false);
 //        for(String itemPath : itemPathList){
 //            String itemID = itemPath.replace("https://item.jd.com/","").replace(".html","");
-//            HttpResponse response = toolroom.HttpUtils.doGet(itemPath);
+//            HttpResponse response = toolroom.CustomWorker.doGet(itemPath);
 //            if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //                HttpEntity entity = response.getEntity();
 //                if(entity != null){
@@ -87,7 +87,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private String getPrice(String itemID) throws IOException {
 //        String urlStr = Const.jdPriceURLStr.replace("%%ii%%",itemID);
-//        HttpResponse response = toolroom.HttpUtils.doGet(urlStr);
+//        HttpResponse response = toolroom.CustomWorker.doGet(urlStr);
 //        if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 //            HttpEntity entity = response.getEntity();
 //            if(entity != null){
