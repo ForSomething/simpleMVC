@@ -1,0 +1,40 @@
+package utils.communication.network.http;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import pool.ObjectPool;
+
+import java.lang.reflect.Proxy;
+
+public class BrowserControllerWorker extends BaseHttpWorker {
+    private static ObjectPool<WebDriver> driverPool;
+
+    private WebDriver webDriver;
+
+    BrowserControllerWorker(){
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");//启动无头模式--无UI模式
+        webDriver = new ChromeDriver(chromeOptions);
+    }
+
+    @Override
+    public void request(Request r) {
+
+    }
+
+    @Override
+    public Response getResponse() {
+        return null;
+    }
+
+    @Override
+    public void executeScript(String script) {
+        super.executeScript(script);
+    }
+
+    @Override
+    public void close() {
+        webDriver.close();
+    }
+}
