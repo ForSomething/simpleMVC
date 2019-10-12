@@ -20,17 +20,21 @@ public class BrowserControllerWorker extends BaseHttpWorker {
 
     @Override
     public void request(Request r) {
-
+        webDriver.get(r.getRequestURL());
     }
 
     @Override
     public Response getResponse() {
-        return null;
+        Response response = new Response();
+        response.setBaseUrl(webDriver.getCurrentUrl());
+        response.setStateCode(200);
+        response.setContent(webDriver.getPageSource().getBytes());
+        return response;
     }
 
     @Override
     public void executeScript(String script) {
-        super.executeScript(script);
+        ((ChromeDriver)webDriver).executeScript(script);
     }
 
     @Override
