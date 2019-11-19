@@ -24,16 +24,14 @@ public class PersonalCreditReportTableParser {
             Element tr = allTrs.get(trIndex);
             if(tr.select("table").size() > 0){//这个判断条件需不需要是这样，还不得而知
                 //如果这一行里面存在table元素，在根据目前已知的征信报告格式，我们就认为这一行是做排版用的
-                // todo 此处需要做一些排版行的相关操作
                 //目前想到的排版行的相关操作有如下
-                //1、排版行一定是涉及新table的，在此处就需要新建一个table对象，然后下面的行，一定是在这个新table中的
-                //排版行的子元素中，只会有一个table
+                //1、排版行一定是涉及新table的，在此处就需要新建一个table对象，然后下面的行，一定是在这个新table中的(排版行的子元素中，只会有一个table)
                 TableRow positionRow = new TableRow();
                 currentTable.addRow(positionRow);
                 TableCell cell = new TableCell();
                 positionRow.addCell(cell);
-                cell.setContent(currentTable);
                 currentTable = new Table();
+                cell.setContent(currentTable);
                 continue;
             }
             //如果不是排版行则按列入表
@@ -51,8 +49,13 @@ public class PersonalCreditReportTableParser {
                 currentTable = rootTable;
             }
         }
+        explain(rootTable);
         String sdfsdf = JsonUtils.parse2Json(rootTable);
-        FileUtils.write(new File("E:/Temp/parsedJson.json"),sdfsdf);
-        return null;
+        FileUtils.write(new File("E:\\work\\zhixiaoyinhang\\文档\\人行\\征信中心爬虫\\parsedJson.json"),sdfsdf);
+        return rootTable;
+    }
+
+    public static void explain(Table table){
+
     }
 }
