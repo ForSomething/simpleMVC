@@ -1,13 +1,19 @@
 package sid.utils.db;
 
 
+import org.apache.commons.beanutils.BeanUtils;
+import sid.utils.CommonStringUtils;
+import sid.utils.miscellaneous.CommonLogger;
+
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Logger;
 
 public class DBUtils {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+//    static final String DB_URL = "jdbc:mysql://localhost:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/local-sit?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+//    static final String DB_URL = "mysql://127.0.0.1:3306/local-sit?useUnicode=true&amp;characterEncoding=UTF-8&amp;useOldAliasMetadataBehavior=true";
 
     static final String USER = "root";
     static final String PASS = "123456";
@@ -28,37 +34,30 @@ public class DBUtils {
         }
     }
 
-    public static void executeBySqlTemplate(String sqlTemplate, List<Object> parameters, boolean autoCommit) throws Exception {
-        Connection connection = getConnection(autoCommit);
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlTemplate);
+    public static void executeBySqlTemplate(String sqlTemplate, List<Object> parameters) throws Exception {
+        executeBySqlTemplate(sqlTemplate,parameters,false);
+    }
+
+    public static void executeBySqlTemplate(String sqlTemplate, Object param, boolean autoCommit) throws Exception {
+        PreparedStatement preparedStatement = null;
         try{
-            for(int index = 0; index < parameters.size();index++){
-                Object value = parameters.get(index);
-                preparedStatement.setObject(index + 1,value == null ? null : value.toString());// TODO 这里要进行处理，不能一味的tostring
-            }
+            preparedStatement = getStatement(sqlTemplate,param,autoCommit);
             preparedStatement.execute();
         }finally {
-            preparedStatement.close();
             if(autoCommit){
-                closeConnection(connection);
+                close(preparedStatement);
             }
         }
     }
 
-    public static List<Map<String,Object>> executeQuerySql(String sql, List<Object> parameters) throws Exception {
-        Connection connection = getConnection(true);
+    public static List<Map<String,Object>> executeQuerySql(String sqlTemplate, Object param) throws Exception {
         ResultSet resultSet = null;
         List<Map<String,Object>> resultList = new LinkedList<>();
         List<String> columnLables = null;
-//        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-//        if(parameters != null && parameters.size() > 0){
-//            for(int index = 0;index < parameters.size();index++){
-//                preparedStatement.setString(index+1,parameters.get(index).toString());
-//            }
-//        }
-        Statement statement = connection.createStatement();
+        PreparedStatement statement = null;
         try{
-            resultSet = statement.executeQuery(sql);
+            statement = getStatement(sqlTemplate,param,false);
+            resultSet = statement.executeQuery();
             while (resultSet.next()){
                 if(columnLables == null){
                     columnLables = new LinkedList<>();
@@ -75,11 +74,46 @@ public class DBUtils {
                 }
             }
         }finally {
-//            preparedStatement.close();
-            resultSet.close();
-            closeConnection(connection);
+            close(statement);
         }
         return resultList;
+    }
+
+    private static PreparedStatement getStatement(String sqlTemplate,Object param,boolean autoCommit) throws Exception {
+        CommonLogger.info("sql模板为：\n" + sqlTemplate);
+        Map paramMap;
+        if(param instanceof Map){
+            paramMap = (Map)param;
+        }else{
+            paramMap = BeanUtils.describe(param);
+        }
+        //匹配被#{}框柱的内容，这些视为参数占位符
+        String placeholdersRegex = "#\\{.+?}";
+        String[] paramPlaceholders = CommonStringUtils.getAllMatchs(sqlTemplate,placeholdersRegex);
+        List<String> paramList = new ArrayList<>(paramPlaceholders.length);
+        for(int index = 0;index < paramPlaceholders.length;index++){
+            String[] parts = paramPlaceholders[index].replaceAll("#\\{|}","").split(":");
+            Object paramObj = paramMap.get(parts[0].trim());
+            //参数为null的，直接不拼接这部分sql
+            if(paramObj == null){
+                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex,"");
+            }else{
+                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex,parts[1]);
+                if(parts[1].contains("?")){
+                    //如果有?占位符的，就添加参数
+                    String paramStr = CommonStringUtils.toString(paramObj);// TODO 这里要进行处理，不能一味的tostring
+                    paramList.add(paramStr);
+                }
+            }
+        }
+        CommonLogger.info("要执行的sql为：\n" + sqlTemplate);
+        CommonLogger.info("参数为：\n" + paramList);
+        Connection connection = getConnection(autoCommit);
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlTemplate);
+        for(int index = 0; index < paramList.size();index++){
+            preparedStatement.setObject(index +1,paramList.get(index));
+        }
+        return preparedStatement;
     }
 
     private static synchronized Connection getConnection(boolean autoCommit) throws Exception {
@@ -102,18 +136,26 @@ public class DBUtils {
             }
             return conn;
         }finally {
-            if(conn.getClientInfo("connectionID") == null){
-                //如果id为空，说明是新连接
-                connectionSerialNumber++;
-                connectionCount++;
-                conn.setClientInfo("connectionID",String.valueOf(connectionSerialNumber));
+            if(conn != null){
+                conn.setClientInfo("commitType",autoCommit ? "autoCommit" : "cmdCommit");
+                if(conn.getClientInfo("connectionID") == null){
+                    //如果id为空，说明是新连接
+                    connectionSerialNumber++;
+                    connectionCount++;
+                    conn.setClientInfo("connectionID",String.valueOf(connectionSerialNumber));
+                }
             }
-            conn.setClientInfo("commitType",autoCommit ? "autoCommit" : "cmdCommit");
         }
     }
 
-    private static synchronized void closeConnection(Connection connection) throws SQLException {
-        connection.close();
+    private static synchronized void close(Statement statement) throws SQLException {
+        if(statement != null){
+            if(statement.getResultSet() != null){
+                statement.getResultSet().close();
+            }
+            statement.getConnection().close();
+            statement.close();
+        }
         connectionCount--;
 
 //        DBUtils.class.notify();

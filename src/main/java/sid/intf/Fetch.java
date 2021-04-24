@@ -157,7 +157,7 @@ public class Fetch {
     Map<String,Object> testMap = new HashMap<>();
     @RequestMapping(path = "/test")
     @ResponseBody
-    public Object doTest(@RequestBody Map paraMap) throws Exception{
+    public Object doTest() throws Exception{
 //        Map<String,Object> result = new HashMap<>();
 //        ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 //        String script = FileUtils.readFileToString(new File("C:\\Users\\Administrator\\Desktop\\test.js"));
@@ -167,7 +167,10 @@ public class Fetch {
 //                put("testObj","5555");
 //            }}));
 //        }};
-        return invokeTest(Fetch::staticMethodTest, CommonStringUtils.toString(paraMap.get("testParam")));
+        return DBUtils.executeQuerySql("select * from e_user where bkno = #{bkno:?} and idno = #{idno:?}",new HashMap<String,String>(){{
+            put("bkno","0102");
+            put("idno","20687");
+        }});
     }
 
     @RequestMapping(path = "/getIndex")
