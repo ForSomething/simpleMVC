@@ -76,19 +76,19 @@ public class DirectBankIntfCaller {
         return out;
     }
 
-//    public static List<Map> executeSql(String sql, Map param) throws Exception {
-//        sql = sql.trim();
-//        String preStr = sql.substring(0,"select".length());
-//        if(preStr.equalsIgnoreCase("select")){
-//            //查询
-//            DBUtils.executeQuerySql()
-//            return DAOFactory.getBaseDAO().queryListByTemplate(new StringBuilder(sql),param,Map.class);
-//        }else{
-//            //其他
-//            DAOFactory.getBaseDAO().executeByTemplate(new StringBuilder(sql),param);
-//        }
-//        return new ArrayList<>();
-//    }
+    public static List<Map<String,Object>> executeSql(String sql, Map param,Boolean autoCommit) throws Exception {
+        sql = sql.trim();
+        String preStr = sql.substring(0,"select".length());
+        if(preStr.equalsIgnoreCase("select")){
+            //查询
+            return DBUtils.executeQuerySql(sql,param);
+        }else{
+            //其他
+            autoCommit = autoCommit == null ? false : autoCommit;
+            DBUtils.executeBySqlTemplate(sql,param,autoCommit);
+        }
+        return new ArrayList<>();
+    }
 
     private static Response doRequest(String bkno,String url,Map<String,Object> param,String sessionId) throws Exception {
         param.put("bkno",bkno);
