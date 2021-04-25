@@ -155,12 +155,19 @@ public class CustomWorker extends BaseHttpWorker{
         //加入cookie
         BasicCookieStore cookieStore = new BasicCookieStore();
         if((tempMap = request.getCookieMap()) != null){
+            int index = 0;
+            StringBuilder cookieBuilder = new StringBuilder();
             for(Map.Entry<String,String> entry : tempMap.entrySet()){
                 BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), entry.getValue());
                 cookie.setVersion(0);
                 cookie.setDomain(request.getDomain());
                 cookie.setPath("/");
                 cookieStore.addCookie(cookie);
+                cookieBuilder.append(index == 0 ? "" : "; ").append(entry.getKey()).append("=").append(entry.getValue());
+                index++;
+            }
+            if(index != 0){
+                requestBase.setHeader("Cookie",cookieBuilder.toString());
             }
             context.setCookieStore(cookieStore);
         }
