@@ -6,7 +6,7 @@ public class RTCDNotSuccessException extends RuntimeException {
     private static final String defaultRtcd = "9999";
 
     public RTCDNotSuccessException(String msg) {
-        super("rtcd=" + defaultRtcd + ";msg = " + null);
+        super("rtcd=" + defaultRtcd + ";msg = " + msg);
         this.msg = msg;
         this.rtcd = defaultRtcd;
     }
