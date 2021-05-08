@@ -15,11 +15,11 @@ public class Request implements Cloneable {
 
     private int timeoutSeconds = 0;
 
-    private Map<String,String> headerMap = new HashMap<>();
+    private Map<String,Object> headerMap = new HashMap<>();
 
-    private Map<String,String> paramMap = new HashMap<>();
+    private Map<String,Object> paramMap = new HashMap<>();
 
-    private Map<String,String> cookieMap = new HashMap<>();
+    private Map<String,Object> cookieMap = new HashMap<>();
 
     private RequestMethod requestMethod = RequestMethod.GET;
 
@@ -27,15 +27,15 @@ public class Request implements Cloneable {
         return requestURL;
     }
 
-    public Map<String, String> getHeaderMap() {
+    public Map<String, Object> getHeaderMap() {
         return headerMap;
     }
 
-    public Map<String, String> getCookieMap() {
+    public Map<String, Object> getCookieMap() {
         return cookieMap;
     }
 
-    public Map<String, String> getParamMap() {
+    public Map<String, Object> getParamMap() {
         return paramMap;
     }
 
@@ -56,15 +56,15 @@ public class Request implements Cloneable {
         this.requestMethod = requestMethod;
     }
 
-    public void setHeader(String key, String value){
+    public void setHeader(String key, Object value){
         put(headerMap,key,value);
     }
 
-    public void setParam(String key,String value){
+    public void setParam(String key,Object value){
         put(paramMap,key,value);
     }
 
-    public void setCookie(String key,String value){
+    public void setCookie(String key,Object value){
         put(cookieMap,key,value);
     }
 
@@ -100,15 +100,15 @@ public class Request implements Cloneable {
         this.charSet = CommonStringUtils.isEmptyOrWihtespace(charSet) ? "utf-8" : charSet;
     }
 
-    public void setHeaderMap(Map<String, String> headerMap) {
+    public void setHeaderMap(Map<String, Object> headerMap) {
         setMap(this.headerMap,headerMap);
     }
 
-    public void setMap(Map<String, String> paramMap) {
+    public void setParamMap(Map<String, Object> paramMap) {
         setMap(this.paramMap,paramMap);
     }
 
-    public void setCookieMap(Map<String, String> cookieMap) {
+    public void setCookieMap(Map<String, Object> cookieMap) {
         setMap(this.cookieMap,cookieMap);
     }
 
@@ -120,7 +120,7 @@ public class Request implements Cloneable {
         this.timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : 0;
     }
 
-    private void setMap(Map<String, String> destMap, Map<String, String> otherMap){
+    private void setMap(Map<String, Object> destMap, Map<String, Object> otherMap){
         if(otherMap == null){
             return;
         }
@@ -131,14 +131,14 @@ public class Request implements Cloneable {
         destMap.putAll(otherMap);
     }
 
-    private void put(Map<String,String> map, String key, String value){
+    private void put(Map<String,Object> map, String key, Object value){
         if(CommonStringUtils.isEmptyOrWihtespace(key)){
             return;
         }
         map.put(key.trim(),value);
     }
 
-    private void remove(Map<String,String> map,String key){
+    private void remove(Map<String,Object> map,Object key){
         if(map.containsKey(key)){
             map.remove(key);
         }

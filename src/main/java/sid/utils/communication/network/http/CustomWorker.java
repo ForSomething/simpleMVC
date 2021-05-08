@@ -70,10 +70,10 @@ public class CustomWorker extends BaseHttpWorker{
         URIBuilder uriBuilder = new URIBuilder(request.getRequestURL());
         uriBuilder.setCharset(Charset.forName(request.getCharSet()));
         //加入请求参数
-        Map<String,String> tempMap;
+        Map<String,Object> tempMap;
         if((tempMap = request.getParamMap()) != null){
-            for(Map.Entry<String,String> mapEntry : tempMap.entrySet()){
-                uriBuilder.addParameter(mapEntry.getKey(), mapEntry.getValue());
+            for(Map.Entry<String,Object> mapEntry : tempMap.entrySet()){
+                uriBuilder.addParameter(mapEntry.getKey(), CommonStringUtils.toString(mapEntry.getValue()));
             }
         }
         HttpGet httpGet = new HttpGet(uriBuilder.build());
@@ -100,17 +100,17 @@ public class CustomWorker extends BaseHttpWorker{
         Header contentTypeHeader = httpPost.getFirstHeader("Content-Type");
         Request.ContentType contentType = contentTypeHeader == null ? Request.ContentType.X_WWW_FORM_URLENCODED : Request.ContentType.getByActuallyValue(contentTypeHeader.getValue());
         contentType = contentType == null ? Request.ContentType.X_WWW_FORM_URLENCODED : contentType;
-        Map<String,String> tempMap;
+        Map<String,Object> tempMap;
         if((tempMap = request.getParamMap()) != null){
             HttpEntity httpEntity;
             switch (contentType){
                 case APPLICATION_JSON:
-                    httpEntity = new StringEntity(JsonUtils.toJson(tempMap));
+                    httpEntity = new StringEntity(JsonUtils.toJson(tempMap),request.getCharSet());
                     break;
                 case X_WWW_FORM_URLENCODED:
                     List<BasicNameValuePair> paramList = new LinkedList<>();
-                    for(Map.Entry<String,String> mapEntry : tempMap.entrySet()){
-                        paramList.add(new BasicNameValuePair(mapEntry.getKey(),mapEntry.getValue()));
+                    for(Map.Entry<String,Object> mapEntry : tempMap.entrySet()){
+                        paramList.add(new BasicNameValuePair(mapEntry.getKey(),CommonStringUtils.toString(mapEntry.getValue())));
                     }
                     httpEntity = new UrlEncodedFormEntity(paramList,request.getCharSet());
                     break;
@@ -120,8 +120,8 @@ public class CustomWorker extends BaseHttpWorker{
                     httpPost.setHeader("Content-Type",contentType.toString()+"; boundary=" + boundary);
                     builder.setBoundary(boundary);
                     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    for(Map.Entry<String,String> mapEntry : tempMap.entrySet()){
-                        builder.addTextBody(mapEntry.getKey(), mapEntry.getValue());
+                    for(Map.Entry<String,Object> mapEntry : tempMap.entrySet()){
+                        builder.addTextBody(mapEntry.getKey(), CommonStringUtils.toString(mapEntry.getValue()));
                     }
                     builder.setCharset(Charset.forName(request.getCharSet()));
                     httpEntity = builder.build();
@@ -146,10 +146,10 @@ public class CustomWorker extends BaseHttpWorker{
 
     private static void commonInit(HttpClientContext context,HttpRequestBase requestBase,Request request){
         //加入请求头
-        Map<String,String> tempMap;
+        Map<String,Object> tempMap;
         if((tempMap = request.getHeaderMap()) != null){
-            for(Map.Entry<String,String> entry : tempMap.entrySet()){
-                requestBase.setHeader(entry.getKey(),entry.getValue());
+            for(Map.Entry<String,Object> entry : tempMap.entrySet()){
+                requestBase.setHeader(entry.getKey(),CommonStringUtils.toString(entry.getValue()));
             }
         }
         //加入cookie
@@ -157,8 +157,8 @@ public class CustomWorker extends BaseHttpWorker{
         if((tempMap = request.getCookieMap()) != null){
             int index = 0;
             StringBuilder cookieBuilder = new StringBuilder();
-            for(Map.Entry<String,String> entry : tempMap.entrySet()){
-                BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), entry.getValue());
+            for(Map.Entry<String,Object> entry : tempMap.entrySet()){
+                BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), CommonStringUtils.toString(entry.getValue()));
                 cookie.setVersion(0);
                 cookie.setDomain(request.getDomain());
                 cookie.setPath("/");
