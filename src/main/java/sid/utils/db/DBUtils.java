@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 public class DBUtils {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 //    static final String DB_URL = "jdbc:mysql://localhost:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/local-sit?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
-//    static final String DB_URL = "mysql://127.0.0.1:3306/local-sit?useUnicode=true&amp;characterEncoding=UTF-8&amp;useOldAliasMetadataBehavior=true";
+//    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/local-sit?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/local-cpall?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
 
     static final String USER = "root";
     static final String PASS = "123456";
@@ -133,6 +133,8 @@ public class DBUtils {
                 conn = DriverManager.getConnection(DB_URL,USER,PASS);
                 conn.setAutoCommit(false);
                 localConnection.set(conn);
+            }else if (conn.isClosed()){
+                conn = DriverManager.getConnection(DB_URL,USER,PASS);
             }
             return conn;
         }finally {

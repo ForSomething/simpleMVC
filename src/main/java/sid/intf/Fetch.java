@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import sid.bo.common.MonitorLog;
 import sid.crawler.crawlers.BisiCrawler;
 import sid.crawler.crawlers.NETangCrawler;
+import sid.service.fantds.DirectBankIntfCaller;
 import sid.utils.CommonStringUtils;
 import sid.utils.communication.network.http.HttpWorker;
 import sid.utils.communication.network.http.HttpWorkerFactory;
@@ -167,10 +168,8 @@ public class Fetch {
 //                put("testObj","5555");
 //            }}));
 //        }};
-        return DBUtils.executeQuerySql("select * from e_user where bkno = #{bkno:?} and idno = #{idno:?}",new HashMap<String,String>(){{
-            put("bkno","0102");
-            put("idno","20687");
-        }});
+        DirectBankIntfCaller caller = new DirectBankIntfCaller();
+        return caller.processCall("E:\\work\\zhixiaoyinhang\\tools\\flowTest.js",new HashMap<>());
     }
 
     @RequestMapping(path = "/getIndex")
