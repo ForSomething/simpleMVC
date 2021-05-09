@@ -3,7 +3,9 @@ package sid.bo.directbank;
 import sid.bo.BaseDataEntity;
 import sid.bo.annotation.Persistence;
 
-@Persistence(table = "Directbank_Environment")
+import java.util.HashMap;
+
+@Persistence(table = "Directbank_Environment",columnNameRule = Persistence.ColumnNameRule.UNDERLINE_SEPARATOR)
 public class DirectbankEnvironment extends BaseDataEntity {
     private String name;
     private String coreDomain;
@@ -11,6 +13,13 @@ public class DirectbankEnvironment extends BaseDataEntity {
     private String dbDomain;
     private String dbUser;
     private String dbPassword;
+    private String dbName;
+
+    public static DirectbankEnvironment load(String name) throws Exception {
+        return selectFirst(new HashMap<String,Object>(){{
+            put("name",name);
+        }},DirectbankEnvironment.class);
+    }
 
     public String getName() {
         return name;
@@ -58,5 +67,13 @@ public class DirectbankEnvironment extends BaseDataEntity {
 
     public void setDbPassword(String dbPassword) {
         this.dbPassword = dbPassword;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

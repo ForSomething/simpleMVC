@@ -10,13 +10,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class BaseDataEntity {
-    private boolean autoCommit = false;
-
-    public BaseDataEntity setAutoCommit(boolean autoCommit){
-        this.autoCommit = autoCommit;
-        return this;
-    }
-
     public void insert() throws Exception{
         Class entityClass = this.getClass();
         String tableName;
@@ -58,7 +51,7 @@ public class BaseDataEntity {
             fieldsBuilder.append(columnName);
             valuesBuilder.append("?");
         }
-        DBUtils.executeBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters,autoCommit);
+        DBUtils.executeBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters,false);
     }
 
     public void delete(){
@@ -95,6 +88,7 @@ public class BaseDataEntity {
         StringBuilder sqlBilder = new StringBuilder("select * from ").append(tableName).append(" where 1=1 ");
         String fieldName;
         Field[] fields = entityClass.getDeclaredFields();
+        Map<String,String> c2fDic = new HashMap<>(fields.length);
         for(Field field : fields){
             StringBuffer columnName = new StringBuffer();
             field.setAccessible(true);
@@ -106,7 +100,7 @@ public class BaseDataEntity {
                     case UNDERLINE_SEPARATOR:
                         //找出所有的大写字母，在前面加上下划线，所有的小写字母转成大写
                         StringBuilder columnNameBuilder = new StringBuilder();
-                        fieldName.chars().forEach(e->{
+                        for(char e : fieldName.toCharArray()){
                             //第一个字母如果是大写的，就不加下划线了
                             if(Character.isUpperCase(e)){
                                 if(columnNameBuilder.length() != 0){
@@ -116,15 +110,15 @@ public class BaseDataEntity {
                             }else{
                                 columnNameBuilder.append(Character.toUpperCase(e));
                             }
-                        });
+                        }
                         columnName.append(columnNameBuilder.toString());
                         break;
                     default:
                         columnName.append(field.getName());
                 }
             }
+            c2fDic.put(columnName.toString(),fieldName);
             sqlBilder.append(String.format(" #{%s:and %s = ?} ",fieldName,columnName));
-//                    sqlBilder.append(columnName).append(" = '").append(value.toString()).append("' ");
         }
         if(!StringUtils.isEmpty(sortColumns)){
             sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
@@ -132,8 +126,10 @@ public class BaseDataEntity {
         List<Map<String,Object>> resultList = DBUtils.executeQuerySql(sqlBilder.toString(),cond);
         List<T> resultBeanList = new ArrayList<>(resultList.size());
         for (Map<String, Object> one : resultList) {
+            Map<String, Object> nameTransferedMap = new HashMap<>(one.size());
+            one.forEach((k,v)->nameTransferedMap.put(Optional.ofNullable(c2fDic.get(k)).orElseThrow(()->new RuntimeException(String.format("列名[%s]无法匹配",k))),v));
             T resultBean = entityClass.newInstance();
-            BeanUtils.populate(resultBean, one);
+            BeanUtils.populate(resultBean, nameTransferedMap);
             resultBeanList.add(resultBean);
         }
         return resultBeanList;
