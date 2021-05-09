@@ -14,7 +14,7 @@ public @interface Persistence {
 
     String sortColumns() default "";
 
-    ColumnNameRule defaultColumnNameRule() default ColumnNameRule.UNDERLINE_SEPARATOR;
+    ColumnNameRule columnNameRule() default ColumnNameRule.EQUAL;
 
     enum ColumnNameRule{
         EQUAL,//属性和字段同名

@@ -3,12 +3,11 @@ package sid.bo;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import sid.bo.annotation.Persistence;
+import sid.utils.CommonStringUtils;
 import sid.utils.db.DBUtils;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BaseDataEntity {
     private boolean autoCommit = false;
@@ -79,13 +78,13 @@ public class BaseDataEntity {
     }
 
     protected static <T extends BaseDataEntity> List<T> select(Object cond, Class<T> entityClass) throws Exception{
-        Map condMap;
-        List<Object> parameters = new LinkedList<>();
         String tableName = entityClass.getSimpleName();
         String sortColumns = "";
+        Persistence.ColumnNameRule columnNameRule = Persistence.ColumnNameRule.EQUAL;
         if(entityClass.isAnnotationPresent(Persistence.class)){
             //如果类被Table注解标注
             Persistence persistenceAnnotation = entityClass.getAnnotation(Persistence.class);
+            columnNameRule = persistenceAnnotation.columnNameRule();
             if(!StringUtils.isEmpty(persistenceAnnotation.table())){
                 //注解指明了表名，则用注解中的表名
                 tableName = persistenceAnnotation.table();
@@ -93,51 +92,49 @@ public class BaseDataEntity {
             //排序列
             sortColumns = persistenceAnnotation.sortColumns() == null ? "" : persistenceAnnotation.sortColumns().trim();
         }
-        StringBuilder sqlBilder = new StringBuilder("select * from ").append(tableName);
-        if(cond != null){
-            if(cond instanceof BaseDataEntity){
-                condMap = BeanUtils.describe(cond);
-            }else if(cond instanceof Map){
-                condMap = (Map)cond;
-            }else{
-                throw new Exception("不支持的条件对象类型");
-            }
-            int condIndex = 0;
-            String columnName;
-            String fieldName;
-            Object value;
-            Field[] fields = entityClass.getDeclaredFields();
-            for(Field field : fields){
-                field.setAccessible(true);
-                fieldName = field.getName();
-                if(!field.isAnnotationPresent(Persistence.class) || StringUtils.isEmpty((columnName = field.getAnnotation(Persistence.class).column()))){
-                    //如果变量未被Table注解标注，或者注解的column值是空字符串，则用变量名作为列名,否则用column值作为列名
-                    columnName = field.getName();
-                }
-                if((value = condMap.get(fieldName)) != null){
-                    parameters.add(value);
-                    if(condIndex != 0){
-                        sqlBilder.append(" and ");
-                    }else{
-                        sqlBilder.append(" where ");
-                    }
-//                    sqlBilder.append(columnName).append(" = ? ");
-                    sqlBilder.append(columnName).append(" = '").append(value.toString()).append("' ");
-                    condIndex++;
+        StringBuilder sqlBilder = new StringBuilder("select * from ").append(tableName).append(" where 1=1 ");
+        String fieldName;
+        Field[] fields = entityClass.getDeclaredFields();
+        for(Field field : fields){
+            StringBuffer columnName = new StringBuffer();
+            field.setAccessible(true);
+            fieldName = field.getName();
+            Optional.ofNullable(field.getAnnotation(Persistence.class)).ifPresent(e->columnName.append(CommonStringUtils.toString(e.column())));
+            if(columnName.length() == 0){
+                //如果不能从注解中获取到列名，则用变量名来确定列名
+                switch (columnNameRule){
+                    case UNDERLINE_SEPARATOR:
+                        //找出所有的大写字母，在前面加上下划线，所有的小写字母转成大写
+                        StringBuilder columnNameBuilder = new StringBuilder();
+                        fieldName.chars().forEach(e->{
+                            //第一个字母如果是大写的，就不加下划线了
+                            if(Character.isUpperCase(e)){
+                                if(columnNameBuilder.length() != 0){
+                                    columnNameBuilder.append("_");
+                                }
+                                columnNameBuilder.append(e);
+                            }else{
+                                columnNameBuilder.append(Character.toUpperCase(e));
+                            }
+                        });
+                        columnName.append(columnNameBuilder.toString());
+                        break;
+                    default:
+                        columnName.append(field.getName());
                 }
             }
-            if(!StringUtils.isEmpty(sortColumns)){
-                sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
-            }
+            sqlBilder.append(String.format(" #{%s:and %s = ?} ",fieldName,columnName));
+//                    sqlBilder.append(columnName).append(" = '").append(value.toString()).append("' ");
         }
-        List<Map<String,Object>> resultList = DBUtils.executeQuerySql(sqlBilder.toString(),parameters);
-        List<T> resultBeanList = new LinkedList<>();
-        if(resultList.size() > 0){
-            for(int resultIndex = 0;resultIndex < resultList.size();resultIndex++){
-                T resultBean = entityClass.newInstance();
-                BeanUtils.populate(resultBean,resultList.get(resultIndex));
-                resultBeanList.add(resultBean);
-            }
+        if(!StringUtils.isEmpty(sortColumns)){
+            sqlBilder.append(" order by ").append(sortColumns);//拼接上排序字符串
+        }
+        List<Map<String,Object>> resultList = DBUtils.executeQuerySql(sqlBilder.toString(),cond);
+        List<T> resultBeanList = new ArrayList<>(resultList.size());
+        for (Map<String, Object> one : resultList) {
+            T resultBean = entityClass.newInstance();
+            BeanUtils.populate(resultBean, one);
+            resultBeanList.add(resultBean);
         }
         return resultBeanList;
     }

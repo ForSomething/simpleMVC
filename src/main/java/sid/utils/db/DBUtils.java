@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 
 public class DBUtils {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-//    static final String DB_URL = "jdbc:mysql://localhost:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
-//    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/local-sit?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
-    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/local-cpall?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+//    static final String BASE_DB_URL = "jdbc:mysql://localhost:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+//    static final String BASE_DB_URL = "jdbc:mysql://127.0.0.1:3306/local-sit?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
+    static final String BASE_DB_URL = "jdbc:mysql://127.0.0.1:3306/smgdy?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&useServerPrepStmts=true";
 
     static final String USER = "root";
     static final String PASS = "123456";
@@ -101,7 +101,7 @@ public class DBUtils {
                 sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex,parts[1]);
                 if(parts[1].contains("?")){
                     //如果有?占位符的，就添加参数
-                    String paramStr = CommonStringUtils.toString(paramObj);// TODO 这里要进行处理，不能一味的tostring
+                    String paramStr = CommonStringUtils.toString(paramObj);
                     paramList.add(paramStr);
                 }
             }
@@ -125,16 +125,16 @@ public class DBUtils {
 //                DBUtils.class.wait();
 //            }
             if(autoCommit){
-                conn = DriverManager.getConnection(DB_URL,USER,PASS);
+                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
                 return conn;
             }
             conn = localConnection.get();
             if(conn == null){
-                conn = DriverManager.getConnection(DB_URL,USER,PASS);
+                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
                 conn.setAutoCommit(false);
                 localConnection.set(conn);
             }else if (conn.isClosed()){
-                conn = DriverManager.getConnection(DB_URL,USER,PASS);
+                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
             }
             return conn;
         }finally {
