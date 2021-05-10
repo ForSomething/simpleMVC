@@ -25,7 +25,7 @@ public class BaseDataEntity {
         }
         StringBuilder fieldsBuilder = new StringBuilder();
         StringBuilder valuesBuilder = new StringBuilder();
-        List<Object> parameters = new LinkedList<>();
+        Map<String,Object> parameters = new HashMap<>();
         Field[] fields = entityClass.getDeclaredFields();
         String columnName;
         String fieldName;
@@ -33,11 +33,11 @@ public class BaseDataEntity {
         for(Field field : fields){
             field.setAccessible(true);
             columnName = getColumnName(field,columnNameRule);
+            fieldName = field.getName();
             //调用getter获取变量的值
             try{
-                fieldName = field.getName();
-                fieldName = fieldName.substring(0,0).toUpperCase() + fieldName.substring(1,fieldName.length() - 1);
-                value = entityClass.getDeclaredMethod("get" + fieldName).invoke(this);
+                String fieldNameTemp = fieldName.substring(0,0).toUpperCase() + fieldName.substring(1,fieldName.length() - 1);
+                value = entityClass.getDeclaredMethod("get" + fieldNameTemp).invoke(this);
             }catch (Exception e){
                 try{
                     value = field.get(this);
@@ -45,15 +45,15 @@ public class BaseDataEntity {
                     value = null;
                 }
             }
-            parameters.add(value);
+            parameters.put(fieldName,value);
             if(fieldsBuilder.length() > 0){
                 fieldsBuilder.append(",");
                 valuesBuilder.append(",");
             }
             fieldsBuilder.append(columnName);
-            valuesBuilder.append(String.format("#{%s:?}",field.getName()));
+            valuesBuilder.append(String.format("#{%s:?}",fieldName));
         }
-        DBUtils.executeBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters,false,false);
+        DBUtils.executeBySqlTemplate(String.format("insert into %s (%s) values (%s)",tableName,fieldsBuilder.toString(),valuesBuilder.toString()),parameters,true,false);
     }
 
     public void delete(){

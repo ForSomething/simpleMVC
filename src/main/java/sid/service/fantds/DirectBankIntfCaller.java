@@ -25,14 +25,23 @@ public class DirectBankIntfCaller {
     public Map<String,Object> processCall(String processFilePath,Map<String,Object> context) throws Exception{
         String javascript = FileUtils.readFileToString(new File(processFilePath),"utf-8");
 //        //解析语义化的命令集成到js代码中
-        String parsedCinstructionStr = parseSemantiCinstructions();
-        javascript = javascript.replace("#{code}",parsedCinstructionStr);
-        CommonLogger.info("要执行的脚本是：\n" + javascript);
-//        if(true){
+//        String parsedCinstructionStr = parseSemantiCinstructions();
+//        javascript = javascript.replace("#{code}",parsedCinstructionStr);
+//        CommonLogger.info("要执行的脚本是：\n" + javascript);
+        if(true){
 //            DirectbankEnvironment ins1 = DirectbankEnvironment.load("dev3");
 //            DirectbankEnvironment ins2 = DirectbankEnvironment.load("local");
-//            return new HashMap<String, Object>(){{put("mesg","加了挡板");}};
-//        }
+            DirectbankEnvironment ins3 = new DirectbankEnvironment();
+            ins3.setName("test");
+            ins3.setCoreDomain("setCoreDomain");
+            ins3.setDbDomain("setDbDomain");
+            ins3.setDbName("setDbName");
+            ins3.setDbPassword("setDbPassword");
+            ins3.setDbUser("setDbUser");
+            ins3.setVueUrl("setVueUrl");
+            ins3.save();
+            return new HashMap<String, Object>(){{put("mesg","加了挡板");}};
+        }
         JavaScriptExecutor executor = new JavaScriptExecutor(context,javascript);
         return executor.execute(Map.class);
     }

@@ -5,7 +5,7 @@ import sid.bo.annotation.Persistence;
 
 import java.util.HashMap;
 
-@Persistence(table = "Directbank_Environment",columnNameRule = Persistence.ColumnNameRule.UNDERLINE_SEPARATOR)
+@Persistence(table = "directbank_environment",columnNameRule = Persistence.ColumnNameRule.UNDERLINE_SEPARATOR)
 public class DirectbankEnvironment extends BaseDataEntity {
     private String name;
     private String coreDomain;
@@ -19,6 +19,10 @@ public class DirectbankEnvironment extends BaseDataEntity {
         return selectFirst(new HashMap<String,Object>(){{
             put("name",name);
         }},DirectbankEnvironment.class);
+    }
+
+    public void save() throws Exception {
+        insert();
     }
 
     public String getName() {
