@@ -116,34 +116,36 @@ public class DBUtils {
         // TODO 无限制的获取连接可能会出现之前的连接被以外关闭的问题，这里限制连接数看看还会出现这种问题吗
         // TODO 现在发现不是连接数的问题，是县城获取到了被代码关闭的连接，这个可能是线程池的问题
         Connection conn = null;
-        try{
-//            if(connectionCount == 20){
-//                DBUtils.class.wait();
+        conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
+        return conn;
+//        try{
+////            if(connectionCount == 20){
+////                DBUtils.class.wait();
+////            }
+//            if(autoCommit){
+//                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
+//                return conn;
 //            }
-            if(autoCommit){
-                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
-                return conn;
-            }
-            conn = localConnection.get();
-            if(conn == null){
-                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
-                conn.setAutoCommit(false);
-                localConnection.set(conn);
-            }else if (conn.isClosed()){
-                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
-            }
-            return conn;
-        }finally {
-            if(conn != null){
-                conn.setClientInfo("commitType",autoCommit ? "autoCommit" : "cmdCommit");
-                if(conn.getClientInfo("connectionID") == null){
-                    //如果id为空，说明是新连接
-                    connectionSerialNumber++;
-                    connectionCount++;
-                    conn.setClientInfo("connectionID",String.valueOf(connectionSerialNumber));
-                }
-            }
-        }
+//            conn = localConnection.get();
+//            if(conn == null){
+//                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
+//                conn.setAutoCommit(false);
+//                localConnection.set(conn);
+//            }else if (conn.isClosed()){
+//                conn = DriverManager.getConnection(BASE_DB_URL,USER,PASS);
+//            }
+//            return conn;
+//        }finally {
+//            if(conn != null){
+//                conn.setClientInfo("commitType",autoCommit ? "autoCommit" : "cmdCommit");
+//                if(conn.getClientInfo("connectionID") == null){
+//                    //如果id为空，说明是新连接
+//                    connectionSerialNumber++;
+//                    connectionCount++;
+//                    conn.setClientInfo("connectionID",String.valueOf(connectionSerialNumber));
+//                }
+//            }
+//        }
     }
 
     private static synchronized void close(Statement statement) throws SQLException {
