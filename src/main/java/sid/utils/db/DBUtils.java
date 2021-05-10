@@ -34,14 +34,10 @@ public class DBUtils {
         }
     }
 
-    public static void executeBySqlTemplate(String sqlTemplate, List<Object> parameters) throws Exception {
-        executeBySqlTemplate(sqlTemplate,parameters,false);
-    }
-
-    public static void executeBySqlTemplate(String sqlTemplate, Object param, boolean autoCommit) throws Exception {
+    public static void executeBySqlTemplate(String sqlTemplate, Object param, boolean autoCommit,boolean ignoreNullParam) throws Exception {
         PreparedStatement preparedStatement = null;
         try{
-            preparedStatement = getStatement(sqlTemplate,param,autoCommit);
+            preparedStatement = getStatement(sqlTemplate,param,autoCommit,ignoreNullParam);
             preparedStatement.execute();
         }finally {
             if(autoCommit){
@@ -50,13 +46,13 @@ public class DBUtils {
         }
     }
 
-    public static List<Map<String,Object>> executeQuerySql(String sqlTemplate, Object param) throws Exception {
+    public static List<Map<String,Object>> executeQuerySql(String sqlTemplate, Object param,boolean ignoreNullParam) throws Exception {
         ResultSet resultSet = null;
         List<Map<String,Object>> resultList = new LinkedList<>();
         List<String> columnLables = null;
         PreparedStatement statement = null;
         try{
-            statement = getStatement(sqlTemplate,param,false);
+            statement = getStatement(sqlTemplate,param,false,ignoreNullParam);
             resultSet = statement.executeQuery();
             while (resultSet.next()){
                 if(columnLables == null){
@@ -79,7 +75,7 @@ public class DBUtils {
         return resultList;
     }
 
-    private static PreparedStatement getStatement(String sqlTemplate,Object param,boolean autoCommit) throws Exception {
+    private static PreparedStatement getStatement(String sqlTemplate,Object param,boolean autoCommit,boolean ignoreNullParam) throws Exception {
         CommonLogger.info("sql模板为：\n" + sqlTemplate);
         Map paramMap;
         if(param instanceof Map){
@@ -91,17 +87,17 @@ public class DBUtils {
         String placeholdersRegex = "#\\{.+?}";
         String[] paramPlaceholders = CommonStringUtils.getAllMatchs(sqlTemplate,placeholdersRegex);
         List<String> paramList = new ArrayList<>(paramPlaceholders.length);
-        for(int index = 0;index < paramPlaceholders.length;index++){
-            String[] parts = paramPlaceholders[index].replaceAll("#\\{|}","").split(":");
+        for (String paramPlaceholder : paramPlaceholders) {
+            String[] parts = paramPlaceholder.replaceAll("#\\{|}", "").split(":");
             Object paramObj = paramMap.get(parts[0].trim());
-            //参数为null的，直接不拼接这部分sql
-            if(paramObj == null){
-                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex,"");
-            }else{
-                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex,parts[1]);
-                if(parts[1].contains("?")){
+            //参数为null并且忽略空参的，直接不拼接这部分sql
+            if (paramObj == null && ignoreNullParam) {
+                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex, "");
+            } else {
+                sqlTemplate = sqlTemplate.replaceFirst(placeholdersRegex, parts[1]);
+                if (parts[1].contains("?")) {
                     //如果有?占位符的，就添加参数
-                    String paramStr = CommonStringUtils.toString(paramObj);
+                    String paramStr = paramObj == null ? null : CommonStringUtils.toString(paramObj);
                     paramList.add(paramStr);
                 }
             }

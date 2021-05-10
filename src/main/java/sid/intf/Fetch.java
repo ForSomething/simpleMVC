@@ -82,13 +82,13 @@ public class Fetch {
         }
         String tsdt = CommonStringUtils.toString(paraMap.get("tsdt"));
         if(CommonStringUtils.isEmptyOrWihtespace(tsdt)){
-            List<Map<String, Object>> result = DBUtils.executeQuerySql("select max(tsdt) maxTsdt from video_list ",null);
+            List<Map<String, Object>> result = DBUtils.executeQuerySql("select max(tsdt) maxTsdt from video_list ",null,true);
             if(result.size() == 0){
                 throw new Exception("表是空的");
             }
             tsdt = result.get(0).get("maxTsdt").toString();
         }
-        List<Map<String, Object>> result = DBUtils.executeQuerySql(String.format("select * from video_list where id = '%s' and tsdt = '%s'",id,tsdt),null);
+        List<Map<String, Object>> result = DBUtils.executeQuerySql(String.format("select * from video_list where id = '%s' and tsdt = '%s'",id,tsdt),null,true);
         if(result.size() > 0){
             Map<String, Object> itemMap = result.get(0);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -188,7 +188,7 @@ public class Fetch {
     @RequestMapping(path = "/getBookmark")
     @ResponseBody
     public Object getBookmark() throws Exception{
-        return DBUtils.executeQuerySql("select * from bookmark order by create_time desc",null);
+        return DBUtils.executeQuerySql("select * from bookmark order by create_time desc",null,true);
     }
 
     @RequestMapping(path = "/updateBookmark")

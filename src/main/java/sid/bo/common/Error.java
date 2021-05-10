@@ -11,12 +11,7 @@ public class Error extends BaseDataEntity {
     String message;
     String remark;
 
-    public Error(){
-        this.setAutoCommit(true);
-    }
-
     public Error(Timestamp happenTime,String message,String remark){
-        this();
         this.happenTime = happenTime;
         this.message = message;
         this.remark = remark;

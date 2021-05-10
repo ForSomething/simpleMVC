@@ -3,6 +3,7 @@ package sid.service.fantds;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import sid.bo.directbank.DirectbankEnvironment;
 import sid.exception.RTCDNotSuccessException;
 import sid.utils.CommonStringUtils;
 import sid.utils.JsonUtils;
@@ -23,11 +24,13 @@ public class DirectBankIntfCaller {
 
     public Map<String,Object> processCall(String processFilePath,Map<String,Object> context) throws Exception{
         String javascript = FileUtils.readFileToString(new File(processFilePath),"utf-8");
-        //解析语义化的命令集成到js代码中
+//        //解析语义化的命令集成到js代码中
         String parsedCinstructionStr = parseSemantiCinstructions();
         javascript = javascript.replace("#{code}",parsedCinstructionStr);
         CommonLogger.info("要执行的脚本是：\n" + javascript);
 //        if(true){
+//            DirectbankEnvironment ins1 = DirectbankEnvironment.load("dev3");
+//            DirectbankEnvironment ins2 = DirectbankEnvironment.load("local");
 //            return new HashMap<String, Object>(){{put("mesg","加了挡板");}};
 //        }
         JavaScriptExecutor executor = new JavaScriptExecutor(context,javascript);
@@ -119,17 +122,18 @@ public class DirectBankIntfCaller {
         return out;
     }
 
-    public static List<Map<String,Object>> executeSql(String sql, String paramJsonStr,Boolean autoCommit) throws Exception {
+    public static List<Map<String,Object>> executeSql(String sql, String paramJsonStr,Boolean autoCommit,Boolean ignoreNullParam) throws Exception {
         Map param = JsonUtils.parse(paramJsonStr,Map.class);
         sql = sql.trim();
         String preStr = sql.substring(0,"select".length());
         if(preStr.equalsIgnoreCase("select")){
             //查询
-            return DBUtils.executeQuerySql(sql,param);
+            return DBUtils.executeQuerySql(sql,param,true);
         }else{
             //其他
             autoCommit = autoCommit == null ? false : autoCommit;
-            DBUtils.executeBySqlTemplate(sql,param,autoCommit);
+            ignoreNullParam = ignoreNullParam == null ? true : ignoreNullParam;
+            DBUtils.executeBySqlTemplate(sql,param,autoCommit,ignoreNullParam);
         }
         return new ArrayList<>();
     }

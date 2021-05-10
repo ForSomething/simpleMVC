@@ -65,7 +65,7 @@ public class NETangCrawler extends CrawlerBase {
             String tsdt = CommonStringUtils.toString(param.get("tsdt"));
             DBUtils.executeBySqlTemplate("delete from video_list where tsdt = ?",new ArrayList<Object>(){{
                 add(tsdt);
-            }},true);
+            }},true,true);
             if(rootFolder.exists()){
                 CommonFileUtils.forceDelete(rootFolder);
             }
@@ -114,7 +114,7 @@ public class NETangCrawler extends CrawlerBase {
                     add(name);
                     add(url);
                     add(link);
-                }},true);
+                }},true,false);
             }
         }
     }

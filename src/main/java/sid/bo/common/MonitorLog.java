@@ -16,7 +16,6 @@ public class MonitorLog extends BaseDataEntity {
 //        this.createTime = createTime;
         this.state = state;
         this.note = note;
-        this.setAutoCommit(true);
     }
 
 //    public Date getCreateTime() {
